@@ -29,6 +29,12 @@ sources:
     title: Working reader declarations and scoped observation-envelope seam
   - resource: /schema/src/vocab.ts
     title: Existing OTel-inspired names, MIME types, and trace/conversation hybrid
+  - resource: /schema/src/microdata.ts
+    title: Existing extraction subset and permissive item-type matching
+  - resource: /design/ontology/observations0.gpt6a.trig
+    title: Fictional expected dataset for current-content and provenance query checks
+  - resource: /design/ontology/verify0.gpt6a.mjs
+    title: Executed query assertions and exact quad-set checks across TriG/N-Quads dump and reload
   - resource: https://www.w3.org/TR/2017/REC-vocab-ssn-20171019/
     title: SOSA Observation, Sensor, Procedure, Result, Sample, and time semantics
   - resource: https://www.w3.org/TR/2013/REC-prov-o-20130430/
@@ -54,6 +60,8 @@ sources:
 ---
 
 # Pageread — an observable, portable knowledge graph
+
+[Module reading map](./README.md) · [Design corpus](../README.md)
 
 ## 1. Direction and standing
 
@@ -196,6 +204,30 @@ The initial `https://opentelemetry.io/semconv/span`-style item types in
 upstream declarations of RDF classes. Preserve imported spellings as provenance;
 publish our adaptations under our authority. Exact IRI equality governs graph
 terms; a trailing-name match is only a reader heuristic.
+
+### 4.4 Profile validation makes the vocabulary usable
+
+The first profile specifies application constraints as well as term meanings:
+
+- A sealed assertion graph has an observation binding, a procedure/profile
+  version, one declared semantic scope, and one coverage classification. A single
+  acquisition can generate several graphs when its scopes differ.
+- A successful observation identifies its target, observed property, and result.
+  A failed attempt records failure without inventing a successful empty result.
+- A selected generation identifies its definition/policy, exact inputs, content
+  graph, and support graph. Its required representations are available before
+  selection. A provisional conflict selection carries its reason.
+- Every current message occurrence identifies its branch/sequence and position.
+  A source with only partial ordering keeps that uncertainty; the UI may use a
+  labeled presentation order without asserting it as upstream chronology.
+- Attempt ownership, recorded state, and trace correlation have separate fields.
+  Replaying an imported record cannot create a live execution owner.
+
+Unknown source properties and lexical values can be retained as evidence while
+the mapper reports what it could not interpret. Validation is scoped to this
+profile, not a claim that every external RDF graph must satisfy pageread's
+cardinalities. Begin with fixtures and application checks; a machine-readable
+shape document can express the same constraints as the profile stabilizes.
 
 ## 5. Identity, revisions, order, and clocks
 
@@ -450,6 +482,11 @@ durable live-query service. Pageread supplies a publication coordinator:
 Full rebuild is a valid first evaluator and correctness oracle. Shared extraction
 and per-source replacement can follow. Persisted postings are an optimization
 with a mapping/version and input identity; lean snapshots are not a universal law.
+
+Declare source/output graph dependencies and reject view cycles in the initial
+engine. Control-pointer writes and a view's own output are excluded from its
+source subscriptions. This avoids both self-feedback and two broad views
+continually rebuilding from one another's output.
 
 `watch` attaches from a snapshot paired with its cursor, or requests changes after
 a cursor. Bootstrap and catch-up are serialized so no commit falls between the
@@ -733,6 +770,24 @@ understanding with its evidence?**
 
 Primary sources above establish vocabulary meanings and inspected library/API
 capabilities. The architecture, resolution policy, profile, host protocol, and
-landing sequence are proposals. The companion fixture's verification, when run,
-tests a finite expected dataset and its queries; it does not implement the
-resolver, validate every ontology constraint, or prove extension deployment.
+landing sequence are proposals.
+
+### Worked-example verification — 2026-10-20
+
+The [companion verifier](./verify0.gpt6a.mjs) was run using the already installed
+`oxigraph@0.5.12` from `experiments/graphs`. It loads the **170-quad** fictional
+dataset and checks both SPARQL blocks in this document, selected-message values
+and order, provenance back to the overlay capture, isolation of named graphs,
+both historical text candidates, the exact embedded capture string, and the
+recorded running attempt without a fabricated observation result.
+
+It repeats those checks after **TriG and N-Quads dump/reload** and compares the
+complete quad sets. Both formats passed. This IRI-only fixture does not test
+blank-node canonicalization, a resolver implementation, arbitrary binary blobs,
+or browser/native worker recovery. Those remain the proof obligations above.
+
+Run from the repository root, with the graph experiment's dependencies present:
+
+```sh
+node design/ontology/verify0.gpt6a.mjs
+```
