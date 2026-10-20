@@ -16,6 +16,10 @@ sources:
     title: Primary-source browser and live-query research
   - resource: /design/tabula-rasa/research0-content.gpt61s.md
     title: Primary-source content, OTel, and persistent stream research
+  - resource: /design/tabula-rasa/review1-browser.gpt61s.md
+    title: Independent browser-contract review of the initial candidate
+  - resource: /design/tabula-rasa/review1-content.gpt61s.md
+    title: Independent content/publication-contract review of the initial candidate
 ---
 
 # Independent pageread design
@@ -47,9 +51,30 @@ the retained content catalog. The parent design connects these at an explicit
 interpretation/publication boundary. Sources support platform claims; the
 proposed architecture remains a choice.
 
+## Contract review — wave 1
+
+The same two researchers independently reviewed the first candidate, reading
+only the new brief, candidate, and their own prior research:
+
+- [Browser contract review](./review1-browser.gpt61s.md): per-response decoder
+  identity, live-query ownership/disposal, and synchronous DOM snapshot extraction.
+- [Content contract review](./review1-content.gpt61s.md): membership revisions,
+  batch-local references, state replay, pin/follow behavior, projection progress,
+  and persistence guarantees.
+
+The design's [review disposition](./design0.gpt6a.md#15-review-disposition)
+records the resulting corrections. The original candidate was checkpointed before
+revision; the reviews describe that candidate, not the revised text. This work
+used two waves of two Sol-medium researchers, plus the FX contamination scout.
+
 ## Evidence boundary
 
 The audit has a different evidence boundary from the design: its author inspected
 the existing repository; the independent researchers and design author did not
 read the current implementation. Earlier conversation framing remains visible to
 the parent and is explicitly reconsidered in the brief.
+
+Verification here is documentary: primary-source research, independent contract
+review, and local-link/frontmatter/fence checks. Implementation, actual ChatGPT
+behavior, native browser-find interaction, and WXT–Vite+ compatibility remain
+subjects of the proposed verification plan.

@@ -7,13 +7,21 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea512e94affeKEPqju0qHMPIrE"
-    title: Independent architectural derivation, requirements reset, primary-source checks, and interface proposal
+    title: Independent architectural derivation, requirements reset, primary-source checks, and review-driven contract corrections
   - resource: /design/tabula-rasa/brief0.gpt6a.md
     title: User-grounded capabilities and deliberately reopened decisions
   - resource: "opencode://ses_ea5103182ffeZEKBEjHks2vnSJ"
     title: Independent browser, live-query, signals, WXT, and verification research
   - resource: "opencode://ses_ea50ff0acffevf3FXaD3OV4buy"
     title: Independent semantic content, OTel, storage, index, and agent-interface research
+  - resource: /design/tabula-rasa/research0-browser.gpt61s.md
+    title: Preserved browser research and alternative observation designs
+  - resource: /design/tabula-rasa/research0-content.gpt61s.md
+    title: Preserved semantic content research and alternative retained models
+  - resource: /design/tabula-rasa/review1-browser.gpt61s.md
+    title: Review identifying per-stream decoder ownership, query disposal, and synchronous snapshot gaps
+  - resource: /design/tabula-rasa/review1-content.gpt61s.md
+    title: Review identifying missing write tokens, batch references, replay algebra, following policy, and restart guarantees
   - resource: "https://html.spec.whatwg.org/multipage/microdata.html#names:-the-itemprop-attribute"
     title: Microdata property-name restrictions, ordered repeated values, and extraction rules
   - resource: "https://html.spec.whatwg.org/multipage/interaction.html#the-hidden-attribute"
@@ -126,7 +134,12 @@ text, and attachment representations without becoming four different messages.
 
 ```ts
 type URI = string;
-type Revision = string; // opaque; not a timestamp or source ETag
+type Revision<Kind extends string> = string & { readonly revisionKind: Kind };
+type ContentRevision = Revision<"representation">;
+type MembershipRevision = Revision<"membership">;
+type ViewRevision = Revision<"view">;
+type PublicationId = string;
+type Cursor = string; // opaque token scoped to a stream identity and generation
 
 interface ContentKey {
   resource: URI;
@@ -134,8 +147,8 @@ interface ContentKey {
 }
 
 interface ContentRef extends ContentKey {
-  revision: Revision;
-  mediaType: string;
+  revision: ContentRevision;
+  mediaType: string | null; // null means not established
 }
 
 interface SemanticItem {
@@ -271,6 +284,14 @@ streaming-chunk conventions are not established by the reviewed specification;
 our references/chunk events must be labeled custom. Keep content export into
 telemetry an explicit output choice, separate from storing a transcript locally.
 
+The profile's callable surface is `decodeMicrodata`, `encodeMicrodata`, and
+`projectTelemetry(items, evidence)`. The last operation returns validated telemetry
+records **and reasons for omitted projections**, such as unavailable operation
+boundaries. An OTel codec consumes/emits the selected standard record format;
+the semantic profile owns only the adaptation and its custom provenance fields.
+Actual embedded telemetry can enter through an interpreter without first being
+reconstructed from conversation content.
+
 ## 6. Shared observation and live queries
 
 ### Host and source capabilities
@@ -283,7 +304,7 @@ interface ObservationHost {
 interface Reading {
   capabilities(): CaptureCapabilities;
   walk(query: EntityQuery): Promise<ObservedSnapshot>;
-  live(query: EntityQuery): ReadableView<ObservedEntity[]>;
+  live(query: EntityQuery, options?: { signal?: AbortSignal }): LiveQuery<ObservedEntity[]>;
   events(source: SourceSelection, options?: FeedOptions): EventFeed<Observation>;
   refresh(query: EntityQuery): Promise<ObservedSnapshot>;
   close(): Promise<void>;
@@ -310,6 +331,33 @@ Response-body capture needs a byte/time budget and interruption outcome.
 chunk boundaries, replacement patches, cancellation, and completion evidence;
 neither DOM mutations nor network chunks are assumed to be tokens.
 
+Use tagged source frames so concurrent responses cannot share a decoder by
+accident. This is the proposed capture input, not a choice of interception API:
+
+```ts
+interface StreamIdentity {
+  source: string; // recipe source
+  epoch: string; // attachment incarnation
+  stream: string; // one request/response incarnation, never reused in this epoch
+}
+
+type CaptureFrame = { stream: StreamIdentity; sequence: number } & (
+  | { kind: "start"; metadata: CaptureMetadata }
+  | { kind: "chunk"; bytes: Uint8Array }
+  | { kind: "terminal"; outcome: "eof" | "cancelled" | "truncated" | "error" }
+);
+```
+
+Frames are serialized per stream; different streams may interleave. Chunk bytes
+are immutable to consumers. Sequence gaps invalidate decoder continuity. Exactly
+one terminal outcome ends a locally observed stream; no later chunk is accepted.
+A lost host cannot deliver a terminal frame: recovery reports interrupted coverage
+instead of inventing EOF. Transport EOF does not by itself establish successful
+model generation. Cancelling one stream leaves the other decoders running.
+Capture cancellation abandons the observation branch, not the application's
+request. If a host cannot bound capture without blocking the page, it abandons
+capture and reports the gap rather than changing the site's transport behavior.
+
 ### Ownership, roots, and evaluation
 
 Each realm has a shared router that owns compatible source observations and
@@ -318,12 +366,28 @@ can watch several roots; the contract requires sharing, not a particular count
 of observer objects. Releasing one consumer never disconnects another consumer's
 lease. Final release drops listeners, observers, and retained node references.
 
+`live()` acquires a query-owner lease immediately and returns an explicitly
+disposable `LiveQuery`. Its `read()` is useful without a subscription. Each
+subscription can be cancelled independently; the query-owner lease remains until
+`dispose()`, its AbortSignal, or `Reading.close()`. Compatible handles share work
+but have separate ownership. Disposal closes only that handle and its listeners;
+a final closed snapshot may be delivered before disposal completes, and no callback
+starts after it returns. Subsequent `read()` returns the last value marked closed;
+new subscriptions on a closed handle fail. Read-only callers can use `walk()`
+instead when they do not want a live lease.
+
 `EntityQuery` declares:
 
 - root set, CSS selector, traversal policy, and per-root ordering;
 - extractor identity/version, including its field dependencies;
 - invalidation sources: mutations, declared DOM events, explicit refresh;
 - identity extraction and handling of an element reused for another entity.
+
+The DOM extractor is synchronous and side-effect-free: it copies selected DOM
+values into immutable observation input during the scan. It cannot await and
+then read a changed element. Asynchronous interpretation consumes those copied
+values later and carries their observation revision; it does not retain mutable
+DOM handles as its semantic input.
 
 Keep **membership** and **projection** separate: text edits can change an entity
 without changing which elements match. Reuse membership evaluation where safe;
@@ -370,9 +434,13 @@ interface ReadableView<T> {
   ): () => void;
 }
 
+interface LiveQuery<T> extends ReadableView<T> {
+  dispose(): void;
+}
+
 interface ViewSnapshot<T> {
   value: T;
-  revision: Revision;
+  revision: ViewRevision;
   coverage: Coverage;
   status: "ready" | "refreshing" | "degraded" | "closed";
 }
@@ -391,11 +459,16 @@ Disposal of the bridge releases its subscription.
 Durable or remote collections additionally expose a streaming handoff protocol:
 
 ```ts
-type WatchFrame<T> =
+type Change<T, Key> =
+  | { kind: "upsert"; key: Key; value: T } // complete replacement, not a patch
+  | { kind: "delete"; key: Key };
+
+type WatchFrame<T, Key = string> =
   | { kind: "snapshot-begin"; snapshot: string; at: Cursor; coverage: Coverage }
-  | { kind: "snapshot-page"; snapshot: string; entries: T[] }
+  | { kind: "snapshot-page"; snapshot: string; entries: { key: Key; value: T }[] }
   | { kind: "ready"; at: Cursor }
-  | { kind: "change"; base: Cursor; cursor: Cursor; changes: Change<T>[] }
+  | { kind: "change"; base: Cursor; cursor: Cursor; publication: PublicationId;
+      changes: Change<T, Key>[] }
   | { kind: "reset-required"; reason: string }
   | { kind: "closed"; reason: string };
 ```
@@ -405,6 +478,21 @@ All snapshot pages describe one boundary; changes after that boundary arrive
 after `ready`. Resume from `after` yields later changes when retained, otherwise
 `reset-required`. At-least-once delivery is sufficient when changes have stable
 IDs/cursors. Consumers can detect and skip redelivery.
+
+A snapshot replaces the consumer's prior state, assembling pages privately until
+`ready`. A change frame is one atomic view transition; apply all keyed changes
+and then advance to its cursor. Repeated cursor means the same immutable frame:
+skip an already-applied cursor, otherwise require `base` to equal the current
+cursor. An unrecognized mismatch requires reset rather than guessing order from
+opaque strings. State changes carry full values, including membership revisions
+and ordering fields; sorting follows the index definition with a deterministic
+identity tie-breaker. A content key is the resource/representation tuple; an
+index key is its entry ID.
+
+A resume request starts with retained changes after its supplied boundary, not
+a new unannounced snapshot. Snapshot-pagination expiry returns `reset-required`;
+it never silently switches later pages to the latest head. This log reconstructs
+published state, not unrecorded source traffic or every intermediate DOM state.
 
 For transient DOM state, an epoch change or overflow can demand a new snapshot.
 For durable changes, retention and replay floor are advertised. Buffers are
@@ -423,18 +511,20 @@ readers can also send transient observations directly to an event output.
 ### Cache-shaped content access
 
 ```ts
-interface WriteCondition {
+interface WriteCondition<R> {
   operationId: string; // idempotent retry of the same operation
-  expectedRevision: Revision | null; // null means create-only
+  expectedRevision: R | null; // null means create-only
 }
 
+type UpdateCondition<R> = WriteCondition<R> & { expectedRevision: R };
+
 interface ContentStore {
-  put(key: ContentKey, response: Response, write: WriteCondition): Promise<ContentRef>;
-  match(key: ContentKey | ContentRef): Promise<StoredRepresentation | undefined>;
-  matchAll(query: ContentQuery): Promise<Page<StoredRepresentation>>;
+  put(key: ContentKey, response: Response, write: WriteCondition<ContentRevision>): Promise<ContentRef>;
+  match(key: ContentKey | ContentRef): Promise<StoredRepresentation | UnavailableRepresentation | undefined>;
+  matchAll(query: ContentQuery): Promise<Page<StoredRepresentation | UnavailableRepresentation>>;
   keys(query?: ContentQuery): Promise<Page<ContentRef>>;
-  delete(key: ContentKey, write: WriteCondition): Promise<CommitReceipt>;
-  watch(options?: WatchOptions): AsyncIterable<WatchFrame<ContentRef>>;
+  delete(key: ContentKey, write: UpdateCondition<ContentRevision>): Promise<CommitReceipt>;
+  watch(options?: WatchOptions): AsyncIterable<WatchFrame<ContentRef, ContentKey>>;
 }
 ```
 
@@ -442,6 +532,9 @@ This is inspired by Cache methods, not a browser `Cache` polyfill. Important
 departures are explicit representation keys, immutable revision reads, conditional
 writes, namespaces, and changes. `StoredRepresentation` includes the resolved
 reference and an independently consumable `Response` for that caller.
+`UnavailableRepresentation` identifies a known reference whose body is unavailable;
+`undefined` means no known matching key/revision. Enumeration reports unavailable
+entries explicitly as well, rather than dropping them from a claimed complete view.
 
 - `match(key)` selects the current head; `match(ref)` selects exactly that revision.
   A missing/evicted exact revision is reported, never replaced with newer bytes.
@@ -471,20 +564,34 @@ interface IndexRegistry {
 
 interface Index {
   describe(): Promise<IndexDescription>;
-  add(entry: IndexEntry, write: WriteCondition): Promise<CommitReceipt>;
-  delete(entryId: string, write: WriteCondition): Promise<CommitReceipt>;
-  getAll(page?: SnapshotPageRequest): Promise<SnapshotPage<IndexEntry>>;
-  watch(options?: WatchOptions): AsyncIterable<WatchFrame<IndexEntry>>;
+  add(entry: IndexEntryDraft, write: WriteCondition<MembershipRevision>): Promise<CommitReceipt>;
+  delete(entryId: string, write: UpdateCondition<MembershipRevision>): Promise<CommitReceipt>;
+  getAll(page?: SnapshotPageRequest): Promise<SnapshotPage<VersionedEntry>>;
+  watch(options?: WatchOptions): AsyncIterable<WatchFrame<VersionedEntry>>;
+  progress(): Promise<ProjectionProgress>;
+  waitFor(publication: PublicationId, options?: { signal?: AbortSignal }): Promise<ProjectionWait>;
 }
 
-interface IndexEntry {
+type ContentSelection =
+  | { kind: "metadata-only" }
+  | { kind: "pin"; ref: ContentRef }
+  | { kind: "follow"; key: ContentKey };
+
+interface IndexEntryDraft {
   id: string; // local membership identity within this index
   resource: URI;
-  content?: ContentRef; // pinned, if this entry has a known representation
+  content: ContentSelection;
   title?: string;
   description?: string;
   launchUrl?: string;
   orderKey?: string; // ordered only within this definition's ordering scheme
+}
+
+interface VersionedEntry {
+  entry: IndexEntryDraft;
+  revision: MembershipRevision;
+  resolvedContent?: ContentRef; // exact ref selected at this entry revision
+  contentState: "metadata-only" | "available" | "unavailable";
 }
 ```
 
@@ -505,6 +612,28 @@ definition is an error. Changing a projector definition creates a new generation
 and invalidates old cursors deliberately. A derived index's definition names its
 inputs, and cyclic projection dependencies are rejected in the initial design.
 
+Every read, upsert change, and write receipt exposes the membership revision.
+It is not the referenced content's revision or an index-wide cursor. Create-only
+requires no current member; updates/deletes require the current membership token.
+Delete/recreate never reuses the old token, so an intervening recreation cannot
+make a stale conditional write succeed. The same rule applies to content heads.
+
+The content selection has observable consequences:
+
+- **Metadata-only:** no implicit body resolution or subscription.
+- **Pin:** retain an exact representation reference; future content edits do not
+  advance it. Availability changes may emit an upsert without changing the pin;
+  a body becoming unavailable is not reported as empty text.
+- **Follow:** select a specific resource/representation head. The index maintains
+  a resolved pin and emits an upsert/new membership revision when it advances.
+  This dependency is a built-in projection with reported progress, even when
+  membership itself is managed. A missing head has unavailable state.
+
+A resource URI by itself does not select a representation. A transcript can follow
+semantic message representations that reference their Markdown/body revisions;
+a research index can pin the same messages. A branch-selection change affects
+only indexes whose definitions depend on that selection.
+
 Possible indexes include account transcripts, account projects, a project's
 conversations, a conversation's messages, an individual message's parts, a chosen
 branch, and an agent's scratch selection. Overlapping membership is ordinary.
@@ -517,18 +646,87 @@ enumerated." Entry metadata can exist before a transcript body has been captured
 
 ### Publication and persistence
 
-The reader runtime publishes a batch of representation writes, semantic-item
-updates, and managed membership updates with per-target revision preconditions
-and an operation ID. The reference host commits that batch and its change records
-in one local transaction. Events identifying successful persistence are emitted
-after commit. A retried operation returns the original outcome or a conflict if
-its payload differs.
+Semantic items live in ordinary versioned `application/json` representations,
+read through `content.match`, not an unmentioned second entity database. Their
+document can include the item and its related representation references. Use one
+publication call for content and memberships that must become visible together:
+
+```ts
+type BatchRef = { existing: ContentRef } | { pending: string }; // batch-local handle
+
+interface Publication {
+  operationId: string;
+  puts: {
+    handle: string;
+    key: ContentKey;
+    expectedRevision: ContentRevision | null;
+    body: { kind: "response"; response: Response }
+      | { kind: "semantic"; item: SemanticItem; representations: BatchRef[] };
+  }[];
+  memberships: MembershipCommand[];
+  deletions: ContentDeleteCommand[];
+}
+
+interface PublicationHost {
+  publish(batch: Publication): Promise<CommitReceipt>;
+}
+
+interface CommitReceipt {
+  publication: PublicationId;
+  content: Record<string, ContentRef>; // resolves each put handle
+  memberships: { index: string; entryId: string; revision: MembershipRevision }[];
+  boundaries: { view: string; cursor: Cursor }[];
+}
+```
+
+`MembershipCommand` is a managed-index add/update/delete with its scoped membership
+precondition. For add/update, a pin may use `BatchRef` instead of `ContentRef`.
+`ContentDeleteCommand` names a content key and its non-null expected revision.
+Batch handles are unique; missing handles or conflicting commands for one target
+are errors. The host allocates refs, resolves pending pins and typed semantic
+representation links, consumes finite bodies, and validates all preconditions.
+Ordinary resource relations use resource URIs and need no revision reservation.
+
+The reference host commits the batch, resolved receipt, and change records in
+one transaction, or exposes none of them. Response bodies are staged before that
+transaction; staging is not publication. Standalone store/index writes are
+single-target publications. Events identifying successful persistence follow
+commit. An idempotent retry checks the stored operation outcome before current
+preconditions and returns the original receipt; reuse with different input fails.
 
 Derived indexes may update later. They report source boundaries applied, failures,
 and stale state. Cross-index cursors are incomparable; asking for aligned views
 requires an explicit common publication boundary, not comparing cursor strings.
 The initial caller can wait for named projections to apply a commit rather than
 requiring a distributed transaction across all indexes.
+
+```ts
+interface ProjectionProgress {
+  state: "current" | "catching-up" | "failed" | "reset-required";
+  inputs: { id: string; generation: string; through: Cursor }[];
+  failure?: Diagnostic;
+}
+
+interface ProjectionWait {
+  outcome: "applied" | "not-applicable" | "failed" | "reset-required";
+  progress: ProjectionProgress;
+}
+```
+
+`progress()` reports an applied boundary for each input identity/generation and
+any failure detail. A managed index without following dependencies has no inputs.
+`waitFor(publication)` reports `applied` only when that publication's relevant
+effects have been applied through the dependency graph; unrelated publications are
+reported as not applicable. Failure, expired input history, and cancellation
+are explicit outcomes, not endless success-looking waits; cancellation rejects
+with the abort reason rather than reporting applied progress.
+
+A projector commits its output and input progress together, or uses a recoverable
+idempotent application protocol with equivalent behavior. Restart never advances
+progress beyond committed outputs. If needed input changes are no longer retained,
+rebuild from a new snapshot/generation or report reset. Stateful parser replay
+additionally needs its source prefix or a decoder checkpoint; a final body alone
+does not establish that intermediate source-event replay is possible.
 
 A backend unable to atomically publish content and referencing membership must
 either implement a recoverable publication protocol or decline that capability.
@@ -540,6 +738,17 @@ IndexedDB is an attractive first implementation for this transaction boundary.
 A native CacheStorage adapter, file-backed host, or later Rust host is viable if
 it meets the same published guarantees. Large-body placement and retention policy
 are measured implementation questions, not reasons to change resource identity.
+
+For the reference browser host, acknowledgment means a completed browser-storage
+transaction, surviving worker suspension and ordinary browser restart while that
+storage remains available. It does not claim OS/power-loss or forced-process-crash
+durability. Stronger durability is an advertised backend capability. Receipts and
+stream identity/generation metadata are persisted with commits; receipts initially
+last for the namespace generation. Old-generation write handles fail after a
+namespace reset, rather than treating an old retry as new work. Bounded change
+retention has an advertised floor and expired cursors reset; it is distinct from
+receipt retention and raw-capture retention. Storage eviction/clearing is an
+explicit continuity loss on reconnection, not a successful empty old snapshot.
 
 ## 9. The extension-authoring DSL
 
@@ -572,6 +781,11 @@ export default defineReader({
     derivedFamily("messages", plugin("./views.ts", "messagesByConversation")),
     derivedFamily("parts", plugin("./views.ts", "partsByMessage")),
   ],
+  outputs: [
+    { from: "materializations", to: "local-catalog" },
+    { from: "observations", to: "session-events" },
+    { from: "telemetry", to: "otel-export", enabled: false },
+  ],
   cases: [fixture("history"), fixture("stream-correction"), fixture("dom-only")],
 });
 ```
@@ -581,6 +795,16 @@ DOM selectors. Those belong to the adapter and its verified fixtures. Simple
 selectors and field mappings can be literal recipe data; complex matchers and
 protocol decoders are modules. `derivedFamily` is a template for creating named
 indexes as resources appear, not permission to prune absent ones.
+
+Output names resolve to host-provided sinks. Routes distinguish transient
+observations, accepted materializations, post-commit changes, and telemetry;
+a transient delivery is never labeled persisted. Sink descriptions declare
+accepted profiles/MIME types, delivery mode, queue limits, and retry support.
+`accept(envelope, { signal })` receives a stable event/publication ID and returns
+a delivery receipt; cancellation and errors remain local to that output. A
+non-replayable sink reports gaps explicitly. The catalog sink uses `publish`,
+while event-only readers can omit it. This makes event output an ordinary reader
+capability rather than a side effect of installing a database.
 
 ### Interpreter boundary
 
@@ -594,9 +818,16 @@ interface Interpreter {
 Proposals include semantic-item/property observations, representation candidates,
 relations, telemetry records, coverage updates, and diagnostics. An interpreter
 does not secretly write the store or create observers. The host provides source-
-session state, ordered input, cancellation, and declared dependencies. Stateful
-stream decoders are scoped to that source epoch; independent sources are not
-ordered by a fabricated global timestamp.
+session state, ordered input, cancellation, and declared dependencies. For network
+input, each observation wraps a tagged `CaptureFrame`; decoder state is keyed by
+its full stream identity, with serial interpretation within that stream. AbortSignal
+reaches pending decoder work. Terminal/gap handling releases its state. Shared
+conversation reconciliation is a subsequent operation across stream proposals,
+not shared byte-decoder state. Independent streams are not ordered by a fabricated
+global timestamp. For DOM input, interpretation receives the immutable synchronous
+extraction, never an element to reread after an await.
+The host rejects late proposals from cancelled work or a retired source epoch;
+retained evidence can be reinterpreted later through an explicit replay operation.
 
 Equivalent captured input plus interpreter version/configuration and declared
 context should yield equivalent proposals. Inject observation time and ID
@@ -631,8 +862,10 @@ An extension-building session needs the same public operations as a local author
 ```text
 describe-capabilities, list-profiles, list-interpreters
 content.match, content.put, content.keys
+publish
 indexes.create, indexes.open, indexes.list
 index.getAll, index.add, index.delete, index.watch
+index.progress, index.waitFor
 reader.validate, reader.explain, reader.preview, reader.fixture, reader.build
 reader.replay, evidence.inspect
 ```
@@ -743,12 +976,13 @@ are a separate mode, not a substitute for the MSW test.
 | Claim | Scenario that must verify or falsify it |
 | --- | --- |
 | Gap-free initial subscription | Change an entity while a snapshot is being established and while paginated delivery is in progress; no undetected missing update. |
-| Multi-consumer sharing | Subscribe two projections, count underlying observations, dispose each independently, then verify final teardown. |
+| Multi-consumer sharing | Create/read live handles with and without subscribers; count shared observations; dispose listeners and owners independently; verify final teardown. |
 | Correct live semantics | Ancestor attributes, `:has`, sibling reorder, text-only edit, recycled nodes, event-dependent state, and unsupported selectors. |
 | Honest coverage | Late injection, missing response-body capability, shadow root/frame navigation, virtualized list, and failed pagination. |
-| Bounded streaming | Never-ending body, arbitrary byte boundaries, replacement chunks, slow consumer, overflow, and cancellation. |
-| Durable publication | Crash/restart around commit, retry the same operation, conflict on stale revision, resume after retained and expired cursors. |
-| Independent indexes | One resource in several indexes; remove one membership; update content; verify pins, lag, and remaining memberships. |
+| Bounded streaming | Interleaved response IDs, split UTF-8/protocol frames, replacement chunks, never-ending body, slow consumer, and cancelling only one decoder. |
+| Durable publication | Terminate a worker before/after commit, lose an acknowledgment, restart normally, retry the batch, conflict on stale membership revision, and resume/reset. |
+| Independent indexes | One resource in pinned and following indexes; remove one membership; edit a MIME variant; change branch selection; verify exactly which revisions advance. |
+| Replay and projection progress | Apply a delete/upsert frame twice; expire a paginated snapshot; restart a two-input projector between output/progress; require identical state or explicit reset. |
 | Semantic fidelity | Nested microdata, itemref, repeated values, typed lexical errors, missing model/timing/usage, and misleading quoted markup. |
 | Source reconciliation | Old network response after newer edit, duplicate observations from two tabs, account switch at the same URL. |
 | Trace honesty | Imported trace preserved; insufficient historical evidence produces no invented inference duration or usage. |
@@ -824,3 +1058,25 @@ Outstanding choices should be settled by evidence or human preference:
 
 None prevents writing the small, testable contracts above. None should be silently
 fixed by a package scaffold before the relevant tradeoff is examined.
+
+## 15. Review disposition
+
+The [browser review](./review1-browser.gpt61s.md) and
+[content review](./review1-content.gpt61s.md) independently examined the initial
+candidate checkpoint `e16851b7`. Their findings are retained as review evidence;
+this revision answers them rather than editing their historical assessments.
+
+| Finding | Decision and correction |
+| --- | --- |
+| Concurrent response decoders were underspecified | Use tagged per-stream frames, ordered input, terminal outcomes, and stream-scoped state (§6, §9). |
+| Live ownership had no complete release path | Acquire an explicit disposable query-owner lease; define listener, handle, and reading teardown (§6–7). |
+| Async extraction could break the claimed DOM snapshot | Require synchronous value copying; asynchronous interpretation receives immutable observations (§6, §9). |
+| Conditional membership writes lacked readable tokens | Return membership revisions in envelopes/receipts and separate token scopes (§4, §8). |
+| Atomic publication had no callable request or pending refs | Add `publish`, batch-local handles, resolved receipts, and ordinary semantic representations (§8, §10). |
+| Replay could reconstruct different states | Define full-value keyed upsert/delete, atomic frames, base checks, duplicate handling, and snapshot expiry (§7). |
+| Shared content could ambiguously advance indexes | Explicit metadata-only, pin, and follow selections with observable projection progress (§8). |
+| Projection checkpoints could lie after restart | Commit outputs and progress coherently; expose per-input progress and `waitFor` failure/reset (§8). |
+| Durability and retry lifetime were unbounded claims | State the reference failure model and separate receipt, change, and capture retention (§8, §13). |
+
+The reviews found no material primary-source contradiction in the proposed
+browser or semantic mapping. This is documentary review, not runtime verification.
