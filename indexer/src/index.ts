@@ -1,11 +1,7 @@
 export { createIndexer } from "./factory.ts";
 export { tokenize, normalizeQuery } from "./tokenize.ts";
 export { TextIndex } from "./text-index.ts";
-export type {
-	FindMatch,
-	Indexer,
-	IndexerConfig,
-} from "./types.ts";
+export type { FindMatch, Indexer, IndexerConfig } from "./types.ts";
 export { snapshotUri } from "./types.ts";
 export { transcriptsIndex } from "./shapes/transcripts.ts";
 export type { TranscriptSummary, TranscriptsSnapshot } from "./shapes/transcripts.ts";

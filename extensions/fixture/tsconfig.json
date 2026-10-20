@@ -1,1 +1,5 @@
-{"extends":"./.wxt/tsconfig.json","compilerOptions":{"strict":true,"allowImportingTsExtensions":true,"noEmit":true},"include":["**/*.ts",".wxt/**/*.ts"]}
+{
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": { "strict": true, "allowImportingTsExtensions": true, "noEmit": true },
+  "include": ["**/*.ts", ".wxt/**/*.ts"]
+}

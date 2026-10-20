@@ -7,23 +7,23 @@
 import { state, type Unsubscribe, type WritableSignal } from "./core.ts";
 
 export interface Subscribable<T> {
-	subscribe(listener: (value: T) => void): Unsubscribe;
+  subscribe(listener: (value: T) => void): Unsubscribe;
 }
 
 export class Emitter<T> implements Subscribable<T> {
-	#listeners = new Set<(value: T) => void>();
-	subscribe(listener: (value: T) => void): Unsubscribe {
-		this.#listeners.add(listener);
-		return () => this.#listeners.delete(listener);
-	}
-	emit(value: T): void {
-		// Snapshot permits subscriptions to change during delivery.
-		// oxlint-disable-next-line unicorn/no-useless-spread
-		for (const listener of [...this.#listeners]) listener(value);
-	}
-	get listenerCount(): number {
-		return this.#listeners.size;
-	}
+  #listeners = new Set<(value: T) => void>();
+  subscribe(listener: (value: T) => void): Unsubscribe {
+    this.#listeners.add(listener);
+    return () => this.#listeners.delete(listener);
+  }
+  emit(value: T): void {
+    // Snapshot permits subscriptions to change during delivery.
+    // oxlint-disable-next-line unicorn/no-useless-spread
+    for (const listener of [...this.#listeners]) listener(value);
+  }
+  get listenerCount(): number {
+    return this.#listeners.size;
+  }
 }
 
 /**
@@ -32,18 +32,14 @@ export class Emitter<T> implements Subscribable<T> {
  * solid signals can join the graph without wrapping every consumer.
  */
 export function bridgeExternal<T>(
-	external: { subscribe(cb: (value: T) => void): { unsubscribe(): void } | (() => void) | void },
-	initial: T,
+  external: { subscribe(cb: (value: T) => void): { unsubscribe(): void } | (() => void) | void },
+  initial: T,
 ): WritableSignal<T> {
-	const sig = state<T>(initial);
-	const result = external.subscribe((value: T) => sig.set(value));
-	const dispose =
-		typeof result === "function"
-			? result
-			: result
-				? () => result.unsubscribe()
-				: () => {};
-	// best-effort: dispose is dropped when the signal has no consumers left
-	void dispose;
-	return sig;
+  const sig = state<T>(initial);
+  const result = external.subscribe((value: T) => sig.set(value));
+  const dispose =
+    typeof result === "function" ? result : result ? () => result.unsubscribe() : () => {};
+  // best-effort: dispose is dropped when the signal has no consumers left
+  void dispose;
+  return sig;
 }

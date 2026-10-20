@@ -1,41 +1,41 @@
 {
-	"name": "pageread",
-	"version": "0.0.1",
-	"description": "read pages into traces: otel-semconv microdata, signal-routed live DOM, content-store backends, reactive indexers, bespoke browser extensions",
-	"license": "MIT",
-	"author": "rektide de la faye",
-	"type": "module",
-	"private": true,
-	"packageManager": "pnpm@12.7.0",
-	"scripts": {
-		"build": "pnpm run build:libs && pnpm run build:extension && pnpm --filter @pageread/extension-build verify",
-		"build:libs": "pnpm -r --filter @pageread/schema --filter @pageread/signals --filter @pageread/store --filter @pageread/indexer --filter @pageread/extension-kit build",
-		"build:extension": "pnpm --filter @pageread/fixture-extension build",
-		"dev": "pnpm run build:libs && pnpm --filter @pageread/fixture-extension dev",
-		"check": "concurrently 'pnpm:check:*'",
-		"check:types": "pnpm -r --if-present check:types",
-		"check:lint": "oxlint schema signals store indexer extension-kit extension-build extensions harness",
-		"fix:fmt": "oxfmt",
-		"check:fmt": "oxfmt --check schema signals store indexer extension-kit extension-build extensions harness package.json pnpm-workspace.yaml tsconfig.base.json",
-		"test": "pnpm -r --if-present test",
-		"test:e2e": "pnpm build && pnpm --filter @pageread/browser-harness test:e2e"
-	},
-	"keywords": [
-		"otel",
-		"microdata",
-		"browser-extension",
-		"signals",
-		"chatgpt"
-	],
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/rektide/pageread.git"
-	},
-	"devDependencies": {
-		"@typescript/native-preview": "latest",
-		"concurrently": "^9.2.1",
-		"oxfmt": "^0.74.0",
-		"oxlint": "^1.89.0",
-		"typescript": "^5.9.3"
-	}
+  "name": "pageread",
+  "version": "0.0.1",
+  "private": true,
+  "description": "read pages into traces: otel-semconv microdata, signal-routed live DOM, content-store backends, reactive indexers, bespoke browser extensions",
+  "keywords": [
+    "browser-extension",
+    "chatgpt",
+    "microdata",
+    "otel",
+    "signals"
+  ],
+  "license": "MIT",
+  "author": "rektide de la faye",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rektide/pageread.git"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run build:libs && pnpm run build:extension && pnpm --filter @pageread/extension-build verify",
+    "build:libs": "pnpm -r --filter @pageread/schema --filter @pageread/signals --filter @pageread/store --filter @pageread/indexer --filter @pageread/extension-kit build",
+    "build:extension": "pnpm --filter @pageread/fixture-extension build",
+    "dev": "pnpm run build:libs && pnpm --filter @pageread/fixture-extension dev",
+    "check": "concurrently 'pnpm:check:*'",
+    "check:types": "pnpm -r --if-present check:types",
+    "check:lint": "oxlint schema signals store indexer extension-kit extension-build extensions harness",
+    "fix:fmt": "oxfmt",
+    "check:fmt": "oxfmt --check schema signals store indexer extension-kit extension-build extensions harness package.json pnpm-workspace.yaml tsconfig.base.json",
+    "test": "pnpm -r --if-present test",
+    "test:e2e": "pnpm build && pnpm --filter @pageread/browser-harness test:e2e"
+  },
+  "devDependencies": {
+    "@typescript/native-preview": "latest",
+    "concurrently": "^9.2.1",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@12.7.0"
 }

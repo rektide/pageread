@@ -9,18 +9,18 @@ export type ItemValue = JsonPrimitive | Item | ItemValue[];
 export type JsonValue = JsonPrimitive | Item | JsonValue[] | { [k: string]: JsonValue };
 
 export interface Item {
-	readonly "@type": string;
-	/** Generic items may contain structured attribute bags; narrow before reading. */
-	readonly [prop: string]: unknown;
+  readonly "@type": string;
+  /** Generic items may contain structured attribute bags; narrow before reading. */
+  readonly [prop: string]: unknown;
 }
 
 export function isItem(v: unknown): v is Item {
-	return (
-		typeof v === "object" &&
-		v !== null &&
-		!Array.isArray(v) &&
-		typeof (v as { "@type"?: unknown })["@type"] === "string"
-	);
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    !Array.isArray(v) &&
+    typeof (v as { "@type"?: unknown })["@type"] === "string"
+  );
 }
 
 /** Structural attributes bag — OTel semconv names as keys. */

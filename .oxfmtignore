@@ -1,0 +1,5 @@
+harness/browser/public/mockServiceWorker.js
+harness/browser/test-results/
+**/.output/
+**/.wxt/
+**/dist/

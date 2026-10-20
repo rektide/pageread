@@ -17,79 +17,85 @@ export type Coverage = "complete" | "partial" | "unknown";
  * downstream may treat absence-in-a-partial-capture as deletion.
  */
 export interface ObservationEnvelope {
-	/** The semantic universe for completeness; required before persistence. */
-	scope: { conversationUri: string; domain: "messages" | "title" | "conversation"; branch?: string };
-	coverage: Coverage;
-	/** entity ids this observation actually saw (e.g. message node ids) */
-	covers?: string[];
-	/** upstream revision the source exposed, if any */
-	observedRevision?: string;
-	/** branch identity, if the source branches */
-	branch?: string;
-	/** raw capture provenance URI */
-	captureUri?: string;
+  /** The semantic universe for completeness; required before persistence. */
+  scope: {
+    conversationUri: string;
+    domain: "messages" | "title" | "conversation";
+    branch?: string;
+  };
+  coverage: Coverage;
+  /** entity ids this observation actually saw (e.g. message node ids) */
+  covers?: string[];
+  /** upstream revision the source exposed, if any */
+  observedRevision?: string;
+  /** branch identity, if the source branches */
+  branch?: string;
+  /** raw capture provenance URI */
+  captureUri?: string;
 }
 
 export interface NetworkSource {
-	/** glob URL patterns: "https://chatgpt.com/backend-api/conversation/*" */
-	include: string[];
-	methods?: string[];
-	captureBodies?: boolean;
-	maxBodyBytes?: number;
+  /** glob URL patterns: "https://chatgpt.com/backend-api/conversation/*" */
+  include: string[];
+  methods?: string[];
+  captureBodies?: boolean;
+  maxBodyBytes?: number;
 }
 
 export interface DomSource {
-	/** entities to observe, e.g. "[data-message-author-role]" */
-	selector: string;
-	/** microdata itemtype filter, when entities carry embedded items */
-	itemTypes?: string[];
+  /** entities to observe, e.g. "[data-message-author-role]" */
+  selector: string;
+  /** microdata itemtype filter, when entities carry embedded items */
+  itemTypes?: string[];
 }
 
 export interface ReaderContext {
-	captureUri(capture: Capture): string;
-	nowMs(): number;
+  captureUri(capture: Capture): string;
+  nowMs(): number;
 }
 
 export interface ReaderResult {
-	puts?: PutInput[];
-	contentIndex?: ContentIndexEntry[];
-	/** what this observation actually saw — see ObservationEnvelope */
-	observation?: ObservationEnvelope;
+  puts?: PutInput[];
+  contentIndex?: ContentIndexEntry[];
+  /** what this observation actually saw — see ObservationEnvelope */
+  observation?: ObservationEnvelope;
 }
 
 export interface ReaderSpec {
-	name: string;
-	version: string;
-	match(capture: Capture): boolean;
-	read(capture: Capture, ctx: ReaderContext): Promise<ReaderResult> | ReaderResult;
+  name: string;
+  version: string;
+  match(capture: Capture): boolean;
+  read(capture: Capture, ctx: ReaderContext): Promise<ReaderResult> | ReaderResult;
 }
 
 export interface ExtensionSpec {
-	/** kebab-case; names generated entrypoints */
-	name: string;
-	/** manifest match patterns for the content scripts */
-	matches: string[];
-	network?: NetworkSource;
-	dom?: DomSource;
-	readers: ReaderSpec[];
-	/** index shape names to maintain in the SW */
-	indexes?: string[];
-	runAt?: "document_start" | "document_end" | "document_idle";
+  /** kebab-case; names generated entrypoints */
+  name: string;
+  /** manifest match patterns for the content scripts */
+  matches: string[];
+  network?: NetworkSource;
+  dom?: DomSource;
+  readers: ReaderSpec[];
+  /** index shape names to maintain in the SW */
+  indexes?: string[];
+  runAt?: "document_start" | "document_end" | "document_idle";
 }
 
 export function defineExtension(spec: ExtensionSpec): ExtensionSpec {
-	const issues: string[] = [];
-	if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(spec.name)) issues.push(`name must be kebab-case: ${spec.name}`);
-	if (spec.matches.length === 0) issues.push("matches must not be empty");
-	if (spec.readers.length === 0) issues.push("at least one reader is required");
-	const names = new Set<string>();
-	for (const reader of spec.readers) {
-		if (!reader.name) issues.push("every reader needs a name");
-		else if (names.has(reader.name)) issues.push(`duplicate reader name: ${reader.name}`);
-		else names.add(reader.name);
-	}
-	if (spec.network && spec.network.include.length === 0) issues.push("network.include must not be empty");
-	if (spec.dom && !spec.dom.selector) issues.push("dom.selector is required when dom is set");
-	if (issues.length > 0) throw new Error(`defineExtension: invalid spec\n  ${issues.join("\n  ")}`);
-	return spec;
+  const issues: string[] = [];
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(spec.name))
+    issues.push(`name must be kebab-case: ${spec.name}`);
+  if (spec.matches.length === 0) issues.push("matches must not be empty");
+  if (spec.readers.length === 0) issues.push("at least one reader is required");
+  const names = new Set<string>();
+  for (const reader of spec.readers) {
+    if (!reader.name) issues.push("every reader needs a name");
+    else if (names.has(reader.name)) issues.push(`duplicate reader name: ${reader.name}`);
+    else names.add(reader.name);
+  }
+  if (spec.network && spec.network.include.length === 0)
+    issues.push("network.include must not be empty");
+  if (spec.dom && !spec.dom.selector) issues.push("dom.selector is required when dom is set");
+  if (issues.length > 0) throw new Error(`defineExtension: invalid spec\n  ${issues.join("\n  ")}`);
+  return spec;
 }

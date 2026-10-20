@@ -1,1 +1,20 @@
-{"name":"@pageread/fixture-extension","version":"0.0.1","private":true,"type":"module","scripts":{"build":"wxt build","dev":"wxt","check:types":"wxt prepare && tsgo --noEmit"},"dependencies":{"@pageread/extension-kit":"workspace:*","@pageread/indexer":"workspace:*","@pageread/schema":"workspace:*","@pageread/store":"workspace:*"},"devDependencies":{"wxt":"^0.21.4"}}
+{
+  "name": "@pageread/fixture-extension",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "wxt build",
+    "dev": "wxt",
+    "check:types": "wxt prepare && tsgo --noEmit"
+  },
+  "dependencies": {
+    "@pageread/extension-kit": "workspace:*",
+    "@pageread/indexer": "workspace:*",
+    "@pageread/schema": "workspace:*",
+    "@pageread/store": "workspace:*"
+  },
+  "devDependencies": {
+    "wxt": "^0.21.4"
+  }
+}

@@ -1,24 +1,27 @@
 {
-	"name": "@pageread/indexer",
-	"version": "0.0.1",
-	"description": "Reactive indexer factory over the content store: multiple named indexes (transcripts, projects, per-conversation messages), each queryable, subscribable, and persisted as MIME-typed snapshots",
-	"license": "MIT",
-	"type": "module",
-	"exports": {
-		".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
-	},
-	"scripts": {
-		"build": "tsdown",
-		"check:types": "tsgo --noEmit",
-		"test": "vitest run"
-	},
-	"dependencies": {
-		"@pageread/schema": "workspace:*",
-		"@pageread/signals": "workspace:*",
-		"@pageread/store": "workspace:*"
-	},
-	"devDependencies": {
-		"tsdown": "^0.15.0",
-		"vitest": "^4.0.0"
-	}
+  "name": "@pageread/indexer",
+  "version": "0.0.1",
+  "description": "Reactive indexer factory over the content store: multiple named indexes (transcripts, projects, per-conversation messages), each queryable, subscribable, and persisted as MIME-typed snapshots",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "check:types": "tsgo --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pageread/schema": "workspace:*",
+    "@pageread/signals": "workspace:*",
+    "@pageread/store": "workspace:*"
+  },
+  "devDependencies": {
+    "tsdown": "^0.15.0",
+    "vitest": "^4.0.0"
+  }
 }
