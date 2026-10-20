@@ -14,18 +14,20 @@ export const observations: Observation[] = [
   { graph: "urn:graph:overlay", documentUri: "urn:doc:trace:r11", conversation, branch: "main", domain: "messages", coverage: "partial", revision: 11, captureUri: "urn:capture:r11" },
   { graph: "urn:graph:late", documentUri: "urn:doc:trace:r9", conversation, branch: "main", domain: "messages", coverage: "partial", revision: 9, captureUri: "urn:capture:r9" },
   { graph: "urn:graph:other", documentUri: "urn:doc:trace:other", conversation, branch: "alternative", domain: "messages", coverage: "complete", revision: 99, captureUri: "urn:capture:other" },
+  { graph: "urn:graph:account-b", documentUri: "urn:doc:trace:account-b", conversation: "urn:pageread:conversation:fixture/account-b/c1", branch: "main", domain: "messages", coverage: "complete", revision: 100, captureUri: "urn:capture:account-b" },
   { graph: "urn:graph:metadata", documentUri: "urn:doc:conversation", conversation, branch: "main", domain: "title", coverage: "complete", revision: 11, captureUri: "urn:capture:metadata" },
 ];
 const trace = (messages: Array<[string, string]>) => JSON.stringify({
   "@type": "https://opentelemetry.io/semconv/trace",
-  resource: { attributes: { "pageread.conversation.id": "c1", "pageread.account.id": "account-a" } },
-  spans: messages.map(([id, text], index) => ({ span_id: id, trace_id: "fixture-trace", name: "message", start_time_unix_nano: "1760000000000000001", attributes: { "gen_ai.prompt": text, "pageread.order": index } })),
+  resource: { "@type": "https://opentelemetry.io/semconv/resource", attributes: { "pageread.conversation.id": "c1", "pageread.account.id": "account-a" } },
+  spans: messages.map(([id, text], index) => ({ "@type": "https://opentelemetry.io/semconv/span", span_id: id === "m1" ? "0000000000000001" : "0000000000000002", trace_id: "00000000000000000000000000000001", name: "message", start_time_unix_nano: "1760000000000000001", attributes: { "pageread.node.id": id, "gen_ai.prompt": text, "pageread.order": index } })),
 }, null, 2);
 export const documents: ExactDocument[] = [
   { uri: "urn:doc:trace:r10", mimeType: "application/vnd.pageread.trace+json", body: trace([["m1", "Baseline hello"], ["m2", "Preserved second message 🌍"]]) },
   { uri: "urn:doc:trace:r11", mimeType: "application/vnd.pageread.trace+json", body: trace([["m1", "Updated hello"]]) },
   { uri: "urn:doc:trace:r9", mimeType: "application/vnd.pageread.trace+json", body: trace([["m1", "Older late hello"]]) },
   { uri: "urn:doc:trace:other", mimeType: "application/vnd.pageread.trace+json", body: trace([["m1", "Other branch must not win"]]) },
+  { uri: "urn:doc:trace:account-b", mimeType: "application/vnd.pageread.trace+json", body: trace([["m1", "Other account must not win"]]).replace('"account-a"', '"account-b"') },
   { uri: "urn:doc:conversation", mimeType: "application/vnd.pageread.conversation+json", body: '{\n  "title": "Graph laboratory", "language": "en", "branch": "main"\n}\n' },
 ];
 
@@ -38,7 +40,7 @@ export function fixtureTrig(): string {
     const facts = o.domain === "title"
       ? `${iri(conversation)} pr:title ${literal(parsed.title)}@en .`
       : parsed.spans.map((s: { span_id: string; start_time_unix_nano: string; attributes: Record<string, string> }) =>
-        `${iri(`urn:message:${s.span_id}`)} pr:text ${literal(s.attributes["gen_ai.prompt"])}; pr:timestamp ${literal(s.start_time_unix_nano)}^^xsd:integer .`).join("\n");
+        `${iri(`${o.conversation}/message/${s.attributes["pageread.node.id"]}`)} pr:text ${literal(s.attributes["gen_ai.prompt"])}; pr:timestamp ${literal(s.start_time_unix_nano)}^^xsd:integer .`).join("\n");
     return `${iri(o.graph)} { ${facts} }`;
   });
   const provenance = observations.map((o) => `${iri(o.graph)} pr:conversation ${iri(o.conversation)}; pr:branch ${literal(o.branch)}; pr:domain ${literal(o.domain)}; pr:coverage ${literal(o.coverage)}; pr:revision ${o.revision}; pr:document ${iri(o.documentUri)}; pr:capture ${iri(o.captureUri)} .`).join("\n");

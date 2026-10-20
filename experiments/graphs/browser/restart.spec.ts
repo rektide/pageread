@@ -1,0 +1,33 @@
+import { test, expect } from "@playwright/test";
+
+test("WASM graph query, physical page reload, IndexedDB restore, and exports", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(String(error)));
+  await page.goto("/");
+  await expect(page.locator("#result")).toContainText("Updated hello");
+  await expect(page.locator("#result")).toContainText("Preserved second message");
+  await page.locator("#iteration").selectOption("checkpoint");
+  await page.locator("#save").click();
+  await expect(page.locator("#status")).toContainText("Checkpoint committed");
+  await page.locator("#empty").click();
+  await expect(page.locator("#result")).toHaveText("[]");
+  await page.reload();
+  await page.locator("#iteration").selectOption("checkpoint");
+  await page.locator("#empty").click();
+  await page.locator("#restore").click();
+  await expect(page.locator("#status")).toContainText("Restored checkpoint");
+  await expect(page.locator("#result")).toContainText("Updated hello");
+  await page.locator("#preset").selectOption("Default graph only");
+  const defaults = JSON.parse(await page.locator("#result").innerText());
+  expect(defaults).toHaveLength(1);
+  await page.locator("#union").check();
+  await page.locator("#run").click();
+  expect(JSON.parse(await page.locator("#result").innerText()).length).toBeGreaterThan(1);
+  await page.locator("#query").fill("not valid SPARQL");
+  await page.locator("#run").click();
+  await expect(page.locator("#status")).toContainText("Query failed");
+  const download = page.waitForEvent("download");
+  await page.locator("#export").click();
+  expect((await download).suggestedFilename()).toBe("pageread-graphs.json");
+  expect(errors).toEqual([]);
+});

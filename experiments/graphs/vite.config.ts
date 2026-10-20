@@ -5,5 +5,5 @@ export default defineConfig({
   plugins: [wasm()],
   build: { target: "esnext" },
   optimizeDeps: { exclude: ["oxigraph"] },
-  test: { environment: "node" },
+  test: { environment: "node", include: ["tests/*.test.ts"] },
 });

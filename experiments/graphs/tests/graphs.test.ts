@@ -7,8 +7,8 @@ import { saveCheckpoint, loadCheckpoint } from "../src/checkpoint.ts";
 describe("scoped observations", () => {
   it("overlays only newer covered messages without deleting baseline or importing another branch", () => {
     expect(queryResult(freshStore(), queries["Resolved main branch"])).toEqual([
-      { message: "<urn:message:m1>", text: '"Updated hello"', revision: '"11"^^<http://www.w3.org/2001/XMLSchema#integer>', graph: "<urn:graph:overlay>" },
-      { message: "<urn:message:m2>", text: '"Preserved second message 🌍"', revision: '"10"^^<http://www.w3.org/2001/XMLSchema#integer>', graph: "<urn:graph:baseline>" },
+      { message: "<urn:pageread:conversation:fixture/account-a/c1/message/m1>", text: '"Updated hello"', revision: '"11"^^<http://www.w3.org/2001/XMLSchema#integer>', graph: "<urn:graph:overlay>" },
+      { message: "<urn:pageread:conversation:fixture/account-a/c1/message/m2>", text: '"Preserved second message 🌍"', revision: '"10"^^<http://www.w3.org/2001/XMLSchema#integer>', graph: "<urn:graph:baseline>" },
     ]);
   });
   it("keeps named graphs out of default queries unless union is requested", () => {

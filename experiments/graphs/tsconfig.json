@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "ESNext", "module": "ESNext", "moduleResolution": "Bundler",
     "strict": true, "noEmit": true, "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
     "lib": ["ESNext", "DOM"], "types": ["vite/client"]
   },
-  "include": ["src", "tests", "vite.config.ts"]
+  "include": ["src", "tests", "browser", "vite.config.ts", "playwright.config.ts"]
 }
