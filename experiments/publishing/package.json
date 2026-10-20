@@ -1,0 +1,27 @@
+{
+  "name": "@pageread-experiments/publishing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsdown src/publish.ts --format esm",
+    "test": "node --test src/publish.test.ts",
+    "dry-run": "node src/cli.ts dry-run",
+    "smoke": "node src/cli.ts smoke"
+  },
+  "dependencies": {
+    "@atproto/api": "^0.28.1",
+    "@atproto/lex-cbor": "^0.1.7",
+    "@atproto/lex-data": "^0.1.8",
+    "@atproto/lexicon": "^0.7.17",
+    "@atproto/syntax": "^0.7.7",
+    "msw": "^3.0.3",
+    "oxigraph": "^0.5.12"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2"
+  }
+}
