@@ -8,7 +8,8 @@
     "build": "tsdown src/publish.ts --format esm",
     "test": "node --test src/publish.test.ts",
     "dry-run": "node src/cli.ts dry-run",
-    "smoke": "node src/cli.ts smoke"
+    "smoke": "node src/cli.ts smoke",
+    "integration": "node src/integration.ts"
   },
   "dependencies": {
     "@atproto/api": "^0.28.1",

@@ -81,9 +81,19 @@ test('limits and schema validation reject bad input', async () => {
   assert.throws(() => catalog(exampleNames).assertValidRecord(exampleNames.dataset, { ...prepared.record, createdAt: 'yesterday' }));
 });
 
+test('dataset publication preserves lexical evidence and explicit blank-node graph labels', async () => {
+  const lexical = '_:s <urn:p> "007"^^<http://www.w3.org/2001/XMLSchema#integer> _:g .\n';
+  const prepared = await prepareDataset(exampleNames, lexical, 'application/n-quads', provenance, 'v1');
+  assert.equal(new TextDecoder().decode(prepared.bytes), lexical);
+  assert.deepEqual(prepared.record.graphs, [{ kind: 'BlankNode', value: 'g' }]);
+  const again = await prepareDataset(exampleNames, lexical, 'application/n-quads', provenance, 'v1');
+  assert.equal(again.record.payload.ref.toString(), prepared.record.payload.ref.toString());
+});
+
 test('schema plans are distinct publications with full authority and NSID keys', () => {
   const plans = schemaPlans(exampleNames, mockRepo);
   assert.equal(plans[0].authorityTxt, '_lexicon.experimental.pageread.example.com');
+  assert.equal(JSON.stringify(plans).includes('lex:com.'), false);
   for (const plan of plans) {
     assert.equal(plan.request.collection, 'com.atproto.lexicon.schema');
     assert.equal(plan.request.rkey, plan.request.record.id);

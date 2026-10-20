@@ -1,8 +1,10 @@
 import { Agent } from '@atproto/api';
 import { isDeepStrictEqual } from 'node:util';
-import { BlobRef, jsonToLex, lexToJson } from '@atproto/lexicon';
+import { BlobRef, jsonToLex, lexToJson, lexToIpld } from '@atproto/lexicon';
 import { asMultiformatsCID, cidForRawBytes } from '@atproto/lex-data';
-import { Store } from 'oxigraph';
+import type { LexValue } from '@atproto/lex-data';
+import { cidForLex } from '@atproto/lex-cbor';
+import { parse } from 'oxigraph';
 import { catalog, limits, type Names } from './schemas.ts';
 export { schemaPlans, schemas, exampleNames, limits } from './schemas.ts';
 
@@ -31,21 +33,23 @@ async function prepare(names: Names, bytes: Uint8Array, mime: string, fields: Re
   return result;
 }
 export async function prepareDataset(names: Names, input: string, mime: DatasetMime, provenance: Provenance, mappingVersion: string): Promise<Prepared> {
-  bounded(new TextEncoder().encode(input));
+  const bytes = new TextEncoder().encode(input);
+  bounded(bytes);
   if (!['application/n-quads', 'application/trig'].includes(mime)) throw new Error('Dataset MIME must preserve named graphs');
-  const store = new Store();
-  store.load(input, { format: mime });
-  if (store.size > limits.quads) throw new Error('Too many quads');
+  const quadKeys = new Set<string>();
+  let parsedCount = 0;
   const graphs = new Map<string, { kind: string; value: string }>();
-  for (const q of store.match()) {
+  for (const q of parse([input], { format: mime })) {
+    if (++parsedCount > limits.quads) throw new Error('Too many quads');
+    quadKeys.add(q.toString());
     graphs.set(`${q.graph.termType}:${q.graph.value}`, { kind: q.graph.termType, value: q.graph.value });
+    if (graphs.size > limits.graphs) throw new Error('Too many graphs');
   }
-  if (graphs.size > limits.graphs) throw new Error('Too many graphs');
-  // Store serialization retains the RDF dataset, not just the default graph.
-  const bytes = new TextEncoder().encode(store.dump({ format: mime }));
+  // Keep input bytes: Store.load/dump normalizes e.g. typed "007" to "7"
+  // and relabels blank nodes. Parsing validates without losing lexical evidence.
   return prepare(names, bytes, mime, {
     $type: names.dataset, ...provenance, mappingVersion,
-    quadCount: store.size, graphs: [...graphs.values()],
+    quadCount: quadKeys.size, graphs: [...graphs.values()],
   });
 }
 export async function prepareReader(names: Names, bytes: Uint8Array, mime: 'text/javascript' | 'application/zip', provenance: Provenance,
@@ -76,6 +80,7 @@ export async function readback(agent: Agent, repo: string, rkey: string, prepare
   const record = jsonToLex(lexToJson(result.value)) as Prepared['record'];
   catalog(prepared.names).assertValidRecord(prepared.record.$type, record);
   if (!isDeepStrictEqual(lexToJson(record), lexToJson(prepared.record))) throw new Error('Record readback differs');
+  if ((await cidForLex(lexToIpld(record) as LexValue)).toString() !== result.cid) throw new Error('Record CID differs');
   // The generated SDK decodes text/javascript as text despite getBlob's Uint8Array
   // type. Use the same authenticated transport, retaining the exact bytes instead.
   const query = new URLSearchParams({ did: repo, cid: record.payload.ref.toString() });

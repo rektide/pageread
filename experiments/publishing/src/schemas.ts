@@ -54,7 +54,10 @@ export function catalog(names: Names): Lexicons { return new Lexicons(schemas(na
 
 /** A schema publication plan, NOT an RDF/reader data publication. No DNS/network side effects. */
 export function schemaPlans(names: Names, repo: string) {
-  return schemas(names).map((doc) => ({
+  const docs = schemas(names);
+  // Lexicons normalizes refs in-place to internal lex: URIs. Keep published JSON intact.
+  new Lexicons(structuredClone(docs));
+  return docs.map((doc) => ({
     authorityTxt: `_lexicon.${NSID.parse(doc.id).authority}`,
     expectedTxt: `did=${repo}`,
     request: {
