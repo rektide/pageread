@@ -42,7 +42,7 @@ function queryAffected(selector: string, flat: boolean, batch: MutationBatch): b
 		} else if (record.type === "attributes") {
 			if (flat) {
 				if (
-					record.target.matches?.(selector) ||
+					(record.target instanceof Element && record.target.matches(selector)) ||
 					attributeParticipates(selector, record.attributeName)
 				)
 					return true;

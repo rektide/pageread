@@ -34,10 +34,7 @@ export function bridgeExternal<T>(
 	initial: T,
 ): WritableSignal<T> {
 	const sig = state<T>(initial);
-	const result = (external as { subscribe?: unknown }).subscribe?.call(
-		external,
-		(value: T) => sig.set(value),
-	) as { unsubscribe(): void } | (() => void) | void;
+	const result = external.subscribe((value: T) => sig.set(value));
 	const dispose =
 		typeof result === "function"
 			? result

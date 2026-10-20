@@ -10,7 +10,8 @@ export type JsonValue = JsonPrimitive | Item | JsonValue[] | { [k: string]: Json
 
 export interface Item {
 	readonly "@type": string;
-	readonly [prop: string]: ItemValue;
+	/** Generic items may contain structured attribute bags; narrow before reading. */
+	readonly [prop: string]: unknown;
 }
 
 export function isItem(v: unknown): v is Item {

@@ -51,7 +51,7 @@ class ComputedNode<T> implements Node {
 	evaluated = false;
 	value: T | undefined = undefined;
 	/** deps and the callbacks we registered on them, for unsubscribe */
-	readonly deps = new Map<Node, Set<() => void>>();
+	deps = new Map<Node, Set<() => void>>();
 
 	constructor(
 		private computeFn: () => T,
@@ -120,7 +120,7 @@ class ComputedNode<T> implements Node {
 	}
 }
 
-let evaluationContext: ComputedNode<unknown> | null = null;
+let evaluationContext: Pick<ComputedNode<unknown>, "deps" | "markCheck"> | null = null;
 
 function trackRead(node: Node): void {
 	const ctx = evaluationContext;

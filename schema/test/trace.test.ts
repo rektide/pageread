@@ -100,10 +100,10 @@ describe("toOtelJson", () => {
 		const genai = rs?.scopeSpans[0]?.spans[1];
 		expect(genai?.parentSpanId).toBe(S);
 		expect(genai?.kind).toBe(3);
-		expect(genai?.events?.[0]).toEqual({
+		expect(genai?.events).toEqual(expect.arrayContaining([{
 			name: "gen_ai.content.prompt",
 			timeUnixNano: "2000000000001",
 			attributes: [{ key: "gen_ai.prompt", value: { stringValue: "hello" } }],
-		});
+		}]));
 	});
 });

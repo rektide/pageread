@@ -140,9 +140,6 @@ const DIGITS_RE = /^[0-9]+$/;
 export function validateTrace(t: TraceItem): ValidationIssue[] {
 	const issues: ValidationIssue[] = [];
 	const push = (path: string, message: string) => issues.push({ path, message });
-	if (!isValidTraceId(t.trace_id ?? "")) {
-		// trace items carry the id on spans; a bad one on any span is flagged below
-	}
 	for (const key of Object.keys(t.resource?.attributes ?? {})) {
 		if (key.includes(" ")) push(`resource.attributes.${key}`, "attribute name contains whitespace");
 	}
@@ -159,6 +156,7 @@ export function validateTrace(t: TraceItem): ValidationIssue[] {
 			push(`${p}.end_time_unix_nano`, "must be a digit string of nanoseconds");
 		if (
 			s.end_time_unix_nano !== undefined &&
+			DIGITS_RE.test(s.end_time_unix_nano) &&
 			DIGITS_RE.test(s.start_time_unix_nano ?? "") &&
 			BigInt(s.end_time_unix_nano) < BigInt(s.start_time_unix_nano)
 		)
@@ -250,8 +248,10 @@ export function toOtelJson(t: TraceItem): {
 				return link;
 			});
 		if (s.status) {
-			out.status = { code: STATUS_TO_INT[s.status.code] };
-			if (s.status.message) out.status.description = s.status.message;
+			out.status = {
+				code: STATUS_TO_INT[s.status.code],
+				...(s.status.message ? { description: s.status.message } : {}),
+			};
 		}
 		return out;
 	});
