@@ -22,6 +22,8 @@ sources:
     title: Independent content/publication-contract review of the initial candidate
   - resource: /design/tabula-rasa/rdf-gap0.glm53m.md
     title: RDF interoperability gap, options, and ticket commission
+  - resource: /design/tabula-rasa/rdf-adapt0.glm53m.md
+    title: Win-by-win assessment of the ontology-forward corpus against the gap analysis
 ---
 
 # Independent pageread design
@@ -38,6 +40,9 @@ the existing scaffold. It is a design candidate, not an accepted migration plan.
   a ChatGPT walkthrough, alternatives, and verification obligations.
 - [The RDF gap](./rdf-gap0.glm53m.md): problem statement and graduated options
   for an RDF-shaped vocabulary backbone; ticketed as `pageread-semantics-rdf`.
+- [Adapting the current RDF work](./rdf-adapt0.glm53m.md): win-by-win assessment
+  of the ontology-forward corpus against that gap analysis; the remaining work
+  is the mechanical spine (namespace, vocabulary source, minting rule).
 
 ## Independent research — wave 0
 
