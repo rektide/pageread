@@ -1,10 +1,9 @@
 /**
  * The transcripts index: every conversation the store holds a trace for —
  * id, title, last activity, models, message counts — plus a warm text
- * finder over titles and message content for ctrl+F-shaped find().
+ * token-AND finder over titles and message content.
  */
 import { SEMCONV, type TraceItem } from "@pageread/schema";
-import type { StoredEntry } from "@pageread/store";
 import { TextIndex } from "../text-index.ts";
 import type { IndexerConfig } from "../types.ts";
 import { lastActivityMs, parseTraces, resourceAttrs } from "./shared.ts";

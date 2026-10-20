@@ -1,10 +1,9 @@
 /**
  * The per-conversation message index: one named index per conversation,
  * holding message summaries (role, model, timing, text) with a text
- * finder over each message — the ctrl+F surface for a single chat.
+ * token-AND finder over each message in a single chat.
  */
 import { SEMCONV, type SpanItem } from "@pageread/schema";
-import type { StoredEntry } from "@pageread/store";
 import { TextIndex } from "../text-index.ts";
 import type { FindMatch, IndexerConfig } from "../types.ts";
 import { nanoToMs, parseTraces, resourceAttrs } from "./shared.ts";

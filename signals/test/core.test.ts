@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { batch, computed, effect, state, untrack } from "../src/core.ts";
 
 describe("state/computed", () => {

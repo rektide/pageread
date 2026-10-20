@@ -32,7 +32,7 @@ export const routerStats = { observersCreated: 0, activeRoots: 0 };
 
 const entries = new WeakMap<ParentNode, RouterEntry>();
 
-function entryFor(root: ParentNode, opts: RouterOptions = {}): RouterEntry {
+function entryFor(root: ParentNode, _opts: RouterOptions = {}): RouterEntry {
 	let entry = entries.get(root);
 	if (entry) return entry;
 	const emitter = new Emitter<MutationBatch>();

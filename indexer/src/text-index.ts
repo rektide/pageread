@@ -1,5 +1,5 @@
 /**
- * A tiny inverted index with positions: the ctrl+F engine. Fields are
+ * A tiny token-AND inverted index with positions. Fields are
  * named texts (e.g. "title", "message:spanId"); queries tokenize to terms
  * and intersect postings, returning per-field matches with offsets and
  * excerpts.

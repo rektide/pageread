@@ -61,8 +61,6 @@ export interface TraceItem extends Item {
 // ---------------------------------------------------------------------------
 // builders
 
-let timeOrigin = Date.now();
-
 /** Milliseconds since epoch → OTel nanosecond timestamp string. */
 export function toUnixNano(ms: number): string {
 	return `${Math.round(ms * 1_000_000)}`;
@@ -70,11 +68,6 @@ export function toUnixNano(ms: number): string {
 
 export function nowUnixNano(): string {
 	return toUnixNano(Date.now());
-}
-
-/** Test seam: make ids/timestamps deterministic if a test needs it. */
-export function setTimeOriginForTests(ms: number): void {
-	timeOrigin = ms;
 }
 
 export function resource(attributes: Attributes): ResourceItem {

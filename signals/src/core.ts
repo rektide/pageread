@@ -91,6 +91,8 @@ class ComputedNode<T> implements Node {
 
 	private recompute(): void {
 		const parent = evaluationContext;
+		// This is a dynamic dependency-tracking context, not a scope alias.
+		// oxlint-disable-next-line typescript/no-this-alias
 		evaluationContext = this;
 		const oldDeps = this.deps;
 		this.deps = new Map();

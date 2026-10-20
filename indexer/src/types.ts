@@ -5,7 +5,7 @@
  */
 import type { Unsubscribe } from "@pageread/signals";
 import type { ReadableSignal } from "@pageread/signals";
-import type { ContentStore, StoredEntry, StoreFilter } from "@pageread/store";
+import type { StoredEntry, StoreFilter } from "@pageread/store";
 
 export interface FindMatch {
 	uri: string;

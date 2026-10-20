@@ -5,7 +5,7 @@
  * exported; signals expose the snapshot as a reactive stream.
  */
 import { state, type ReadableSignal } from "@pageread/signals";
-import type { ContentStore, StoredEntry } from "@pageread/store";
+import type { ContentStore } from "@pageread/store";
 import { snapshotUri, type FindMatch, type Indexer, type IndexerConfig } from "./types.ts";
 
 const REFRESH_DEBOUNCE_MS = 150;

@@ -17,6 +17,8 @@ export class Emitter<T> implements Subscribable<T> {
 		return () => this.#listeners.delete(listener);
 	}
 	emit(value: T): void {
+		// Snapshot permits subscriptions to change during delivery.
+		// oxlint-disable-next-line unicorn/no-useless-spread
 		for (const listener of [...this.#listeners]) listener(value);
 	}
 	get listenerCount(): number {
