@@ -30,6 +30,24 @@ describe("state/computed", () => {
 		expect(evals).toBe(evalsBefore + 1);
 	});
 
+	it("an equal-value recompute does not cascade into children", () => {
+		const a = state(1);
+		let childEvals = 0;
+		const parent = computed(() => {
+			a();
+			return "constant";
+		});
+		const child = computed(() => {
+			parent();
+			childEvals++;
+			return childEvals;
+		});
+		expect(child()).toBe(1);
+		a.set(2);
+		expect(child()).toBe(1); // parent recomputed but equal: child skipped
+		expect(childEvals).toBe(1);
+	});
+
 	it("subscribe fires immediately with the current value", () => {
 		const s = state("x");
 		const seen: string[] = [];

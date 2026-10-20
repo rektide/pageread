@@ -55,4 +55,20 @@ describe.each(stores)("content store (%s)", (_name, make) => {
 		expect(await store.delete("urn:pageread:trace:a")).toBe(false);
 		expect(await store.match("urn:pageread:trace:a")).toBeUndefined();
 	});
+
+	it("treats mime/meta changes as entry changes even with identical bodies", async () => {
+		const store = await make();
+		const seen: string[] = [];
+		store.events.subscribe((e) => seen.push(e.type));
+		await store.put({ uri: "urn:pageread:trace:a", mimeType: MEDIA_TYPES.trace, body: "x" });
+		await store.put({ uri: "urn:pageread:trace:a", mimeType: MEDIA_TYPES.item, body: "x" });
+		await store.put({
+			uri: "urn:pageread:trace:a",
+			mimeType: MEDIA_TYPES.item,
+			body: "x",
+			meta: { reclassified: true },
+		});
+		expect(seen).toEqual(["put", "put", "put"]);
+		expect((await store.match("urn:pageread:trace:a"))?.mimeType).toBe(MEDIA_TYPES.item);
+	});
 });

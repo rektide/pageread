@@ -11,7 +11,7 @@ import {
 	trace,
 } from "@pageread/schema";
 import { memoryContentStore } from "@pageread/store";
-import { conversationIndex, createIndexer, projectsIndex, transcriptsIndex } from "../src/index.ts";
+import { conversationIndex, createIndexer, projectsIndex, transcriptsIndex, TextIndex } from "../src/index.ts";
 
 const CONV = "c-1";
 const TRACE_URI = `${URN_STEMS.trace}chatgpt/${CONV}`;
@@ -162,5 +162,36 @@ describe("validateTrace integration", () => {
 		const indexer = createIndexer(store, transcriptsIndex());
 		await indexer.ready;
 		expect(indexer.view()!.conversations).toEqual([]);
+	});
+});
+
+describe("factory regressions", () => {
+	it("survives put events on a uriPrefix-filtered index (event.uri on all variants)", async () => {
+		const store = memoryContentStore();
+		let builds = 0;
+		const indexer = createIndexer(store, {
+			name: "prefixed",
+			filter: { uriPrefix: "urn:pageread:trace:" },
+			build(entries, _prev, ctx) {
+				builds++;
+				return { known: ctx.knownUris };
+			},
+		});
+		await indexer.ready;
+		await store.put({ uri: "urn:pageread:trace:a", mimeType: MEDIA_TYPES.trace, body: "{}" });
+		await new Promise((r) => setTimeout(r, 300));
+		expect(builds).toBeGreaterThanOrEqual(2);
+		expect(indexer.view()).toEqual({ known: ["urn:pageread:trace:a"] });
+	});
+});
+
+describe("TextIndex", () => {
+	it("addField replaces a field's postings instead of appending", () => {
+		const index = new TextIndex();
+		index.addField("urn:a", "message:1", "router batches mutations");
+		index.addField("urn:a", "message:1", "signals join streams");
+		expect(index.find("batches")).toEqual([]);
+		expect(index.find("join")).toHaveLength(1);
+		expect(index.find("router")).toEqual([]);
 	});
 });

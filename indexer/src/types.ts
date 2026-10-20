@@ -20,7 +20,7 @@ export interface IndexerConfig<S> {
 	/** which store entries feed this index */
 	filter?: StoreFilter;
 	/** fold entries (+ previous snapshot) into a new snapshot */
-	build(entries: StoredEntry[], prev: S | undefined, ctx: { changedUris: string[] }): S;
+	build(entries: StoredEntry[], prev: S | undefined, ctx: { knownUris: string[] }): S;
 	/**
 	 * Build a queryable finder from the entries + fresh snapshot. Called
 	 * after every rebuild; snapshots stay lean, finders stay warm.

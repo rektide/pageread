@@ -13,7 +13,10 @@ export interface MutationBatch {
 }
 
 export interface RouterOptions {
-	/** observe characterData changes too (default: false — element queries do not need it) */
+	/**
+	 * Kept for API compatibility; the router always observes the superset
+	 * (characterData included) so no subscriber's requirements are lost.
+	 */
 	characterData?: boolean;
 }
 
@@ -54,7 +57,9 @@ function entryFor(root: ParentNode, opts: RouterOptions = {}): RouterEntry {
 		subtree: true,
 		childList: true,
 		attributes: true,
-		characterData: opts.characterData ?? false,
+		// observe the superset — the first subscriber must not fix options
+		// for everyone; queries ignore what they do not need
+		characterData: true,
 	});
 	routerStats.observersCreated++;
 	routerStats.activeRoots++;

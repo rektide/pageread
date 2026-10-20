@@ -1,7 +1,7 @@
 import { Emitter, type Subscribable } from "@pageread/signals";
 import { etagOf } from "./etag.ts";
 import type { ContentStore, PutInput, StoreEvent, StoredEntry } from "./types.ts";
-import { matchesFilter } from "./types.ts";
+import { entriesEqual, matchesFilter } from "./types.ts";
 
 /** In-memory content store — tests, node, and ephemeral sessions. */
 export function memoryContentStore(): ContentStore {
@@ -12,7 +12,7 @@ export function memoryContentStore(): ContentStore {
 		async put(input: PutInput): Promise<StoredEntry> {
 			const etag = etagOf(input.body);
 			const existing = entries.get(input.uri);
-			if (existing && existing.etag === etag) {
+			if (existing && entriesEqual(existing, { ...input, etag })) {
 				events.emit({ type: "noop", uri: input.uri, etag });
 				return existing;
 			}
@@ -25,7 +25,7 @@ export function memoryContentStore(): ContentStore {
 				storedAt: Date.now(),
 			};
 			entries.set(input.uri, entry);
-			events.emit({ type: "put", entry });
+			events.emit({ type: "put", uri: input.uri, entry });
 			return entry;
 		},
 		async match(uri) {

@@ -19,6 +19,8 @@ export class TextIndex {
 	#texts = new Map<string, Map<string, string>>(); // uri → field → text
 
 	addField(uri: string, field: string, text: string): void {
+		// set semantics: replacing a field removes its old postings first
+		this.removeField(uri, field);
 		let fields = this.#texts.get(uri);
 		if (!fields) {
 			fields = new Map();
@@ -35,6 +37,23 @@ export class TextIndex {
 		}
 	}
 
+	/** alias of addField (set semantics) */
+	setField(uri: string, field: string, text: string): void {
+		this.addField(uri, field, text);
+	}
+
+	removeField(uri: string, field: string): void {
+		if (!this.#texts.has(uri)) return;
+		this.#texts.get(uri)!.delete(field);
+		if (this.#texts.get(uri)!.size === 0) this.#texts.delete(uri);
+		for (const [term, list] of this.#postings) {
+			const kept = list.filter((p) => !(p.uri === uri && p.field === field));
+			if (kept.length === list.length) continue;
+			if (kept.length === 0) this.#postings.delete(term);
+			else this.#postings.set(term, kept);
+		}
+	}
+
 	remove(uri: string): void {
 		if (!this.#texts.has(uri)) return;
 		this.#texts.delete(uri);
@@ -44,9 +63,7 @@ export class TextIndex {
 			if (kept.length === 0) this.#postings.delete(term);
 			else this.#postings.set(term, kept);
 		}
-	}
-
-	clear(): void {
+	}	clear(): void {
 		this.#postings.clear();
 		this.#texts.clear();
 	}

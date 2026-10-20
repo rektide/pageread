@@ -95,11 +95,13 @@ class ComputedNode<T> implements Node {
 		const oldDeps = this.deps;
 		this.deps = new Map();
 		let threw = true;
+		let next: T | undefined;
 		try {
-			this.value = this.computeFn();
+			next = this.computeFn();
 			threw = false;
 		} finally {
 			evaluationContext = parent;
+			const firstEval = !this.evaluated;
 			this.evaluated = true;
 			for (const [dep, cbs] of oldDeps) {
 				if (this.deps.has(dep)) continue;
@@ -107,8 +109,13 @@ class ComputedNode<T> implements Node {
 			}
 			if (!threw) {
 				for (const [dep] of this.deps) this.depVersions.set(dep, dep.version);
+				// version only moves on a real value change — children of a
+				// recomputed-but-equal parent skip their own recompute
+				if (firstEval || !this.equals(next as T, this.value as T)) {
+					this.value = next;
+					this.version++;
+				}
 			}
-			this.version++;
 		}
 	}
 }

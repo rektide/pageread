@@ -27,7 +27,7 @@ export interface PutInput {
 }
 
 export type StoreEvent =
-	| { type: "put"; entry: StoredEntry }
+	| { type: "put"; uri: string; entry: StoredEntry }
 	| { type: "delete"; uri: string; mimeType: string }
 	| { type: "noop"; uri: string; etag: string };
 
@@ -61,4 +61,28 @@ export function matchesFilter(entry: { uri: string; mimeType: string }, filter?:
 	if (filter.uriPrefix !== undefined && !entry.uri.startsWith(filter.uriPrefix)) return false;
 	if (filter.mimeType !== undefined && entry.mimeType !== filter.mimeType) return false;
 	return true;
+}
+
+/**
+ * Entry equality: body hash AND semantic headers (mimeType, meta). A
+ * rename or reclassification with identical bytes is still a change.
+ */
+export function canonicalMeta(meta: PutInput["meta"]): string {
+	if (!meta) return "";
+	return JSON.stringify(
+		Object.keys(meta)
+			.sort()
+			.map((k) => [k, meta[k]]),
+	);
+}
+
+export function entriesEqual(
+	a: { etag: string; mimeType: string; meta?: PutInput["meta"] },
+	b: { etag: string; mimeType: string; meta?: PutInput["meta"] },
+): boolean {
+	return (
+		a.etag === b.etag &&
+		a.mimeType === b.mimeType &&
+		canonicalMeta(a.meta) === canonicalMeta(b.meta)
+	);
 }

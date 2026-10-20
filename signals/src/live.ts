@@ -9,7 +9,10 @@ import { computed, shallowArrayEquals, state, type ReadableSignal } from "./core
 import { domEvents, type MutationBatch } from "./dom-router.ts";
 
 function isFlatSelector(selector: string): boolean {
-	return !/[\s>+~]|:has\(/.test(selector);
+	// combinator- or structure-sensitive selectors get conservative treatment:
+	// sibling insertion can change :nth-child() matches without any added
+	// node itself matching the selector
+	return !/[\s>+~]|:has\(|:nth|:first-|:last-|:only-/i.test(selector);
 }
 
 /**
@@ -32,9 +35,11 @@ function nodeAffects(node: Node, selector: string): boolean {
 
 function queryAffected(selector: string, flat: boolean, batch: MutationBatch): boolean {
 	for (const record of batch.records) {
-		for (const node of record.addedNodes) if (nodeAffects(node, selector)) return true;
-		for (const node of record.removedNodes) if (nodeAffects(node, selector)) return true;
-		if (record.type === "attributes") {
+		if (record.type === "childList") {
+			if (!flat) return true; // structure-sensitive: any insertion/removal can shift matches
+			for (const node of record.addedNodes) if (nodeAffects(node, selector)) return true;
+			for (const node of record.removedNodes) if (nodeAffects(node, selector)) return true;
+		} else if (record.type === "attributes") {
 			if (flat) {
 				if (
 					record.target.matches?.(selector) ||
@@ -100,7 +105,12 @@ export function liveQueryWhere(
 	);
 	domEvents(root).subscribe((batch) => {
 		for (const record of batch.records) {
-			if (record.type === "childList" || record.type === "attributes") {
+			// predicates may depend on anything, including text content
+			if (
+				record.type === "childList" ||
+				record.type === "attributes" ||
+				record.type === "characterData"
+			) {
 				version.update((v) => v + 1);
 				return;
 			}

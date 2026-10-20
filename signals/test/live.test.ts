@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { domEvents, routerStats } from "../src/dom-router.ts";
 import { liveQuery, liveQueryWhere } from "../src/live.ts";
 
@@ -79,6 +79,23 @@ describe("liveQuery", () => {
 		document.body.append(wrap);
 		await flushMicrotasks();
 		expect(q().length).toBe(1);
+	});
+
+	it("structural selectors re-query on any structural change", async () => {
+		// jsdom's selector engine (nwsapi) can itself return stale :nth-child
+		// results after mutation — the DOM above stays correct, only qsa lies.
+		// So this asserts OUR invalidation (a fresh querySelectorAll ran),
+		// not nwsapi's truth. Real browsers are the production target.
+		document.body.innerHTML = "<ul><li>first</li><li id='target'>second</li></ul>";
+		const qsa = vi.spyOn(document, "querySelectorAll");
+		const second = liveQuery("li:nth-child(2)");
+		expect(second()).toHaveLength(1);
+		const callsBefore = qsa.mock.calls.length;
+		document.querySelector("ul")!.prepend(document.createElement("li"));
+		await flushMicrotasks();
+		second();
+		expect(qsa.mock.calls.length).toBeGreaterThan(callsBefore);
+		qsa.mockRestore();
 	});
 });
 

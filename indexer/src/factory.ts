@@ -30,7 +30,9 @@ export function createIndexer<S>(store: ContentStore, config: IndexerConfig<S>):
 			(e) => e.uri !== snapshotUri(config.name),
 		);
 		const prev = await readPrev();
-		const next = config.build(entries, prev, { changedUris: entries.map((e) => e.uri) });
+		// knownUris (not changedUris): full rebuilds see every surviving
+		// entry; incremental maintenance needs the change journal first
+		const next = config.build(entries, prev, { knownUris: entries.map((e) => e.uri) });
 		await store.put({
 			uri: snapshotUri(config.name),
 			mimeType: "application/vnd.pageread.index+json",

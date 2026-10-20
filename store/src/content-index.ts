@@ -98,7 +98,10 @@ export function contentIndexOver(
 			return true;
 		},
 		async deleteAll() {
+			const dir = await readDirectory();
+			const removed = dir.entries;
 			await writeDirectory([]);
+			for (const entry of removed) events.emit({ type: "delete", id: entry.id });
 		},
 	};
 }
