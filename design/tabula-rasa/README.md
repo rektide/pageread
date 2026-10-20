@@ -20,6 +20,8 @@ sources:
     title: Independent browser-contract review of the initial candidate
   - resource: /design/tabula-rasa/review1-content.gpt61s.md
     title: Independent content/publication-contract review of the initial candidate
+  - resource: /design/tabula-rasa/rdf-gap0.glm53m.md
+    title: RDF interoperability gap, options, and ticket commission
 ---
 
 # Independent pageread design
@@ -34,6 +36,8 @@ the existing scaffold. It is a design candidate, not an accepted migration plan.
   of decisions that need independent justification.
 - [Astra's design](./design0.gpt6a.md): the proposed interfaces, their semantics,
   a ChatGPT walkthrough, alternatives, and verification obligations.
+- [The RDF gap](./rdf-gap0.glm53m.md): problem statement and graduated options
+  for an RDF-shaped vocabulary backbone; ticketed as `pageread-semantics-rdf`.
 
 ## Independent research — wave 0
 
