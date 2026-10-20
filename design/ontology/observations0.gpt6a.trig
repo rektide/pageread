@@ -1,0 +1,142 @@
+# Fictional worked dataset accompanying design0.gpt6a.md.
+# Generated 2026-10-20 by model:openai/gpt-6-astra#xhigh.
+# Source: opencode://ses_ea538b494ffej4MXIdPDIIDTLU
+# pr: is a proposed example namespace, not a published ontology.
+# This is expected resolved state, not an executable resolution policy.
+@prefix pr: <https://example.org/pageread/vocab/0#> .
+@prefix ex: <urn:pageread:example:> .
+@prefix schema: <https://schema.org/> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:control {
+  ex:dataset a pr:Dataset ; pr:head "example-epoch:2" .
+  ex:messages-view a pr:ViewDefinition ;
+    pr:definitionVersion "messages/1" ;
+    pr:selectedGeneration ex:generation-2 .
+  ex:generation-2 a pr:ViewGeneration ;
+    pr:contentGraph ex:resolved-2 ; pr:supportGraph ex:support-2 ;
+    pr:sourceCursor "example-epoch:2" ; pr:readiness pr:Ready ;
+    pr:policy ex:resolver-v1 ;
+    prov:wasGeneratedBy ex:resolution-2 .
+}
+
+ex:metadata {
+  ex:conversation a schema:Conversation ; schema:name "A small reader experiment" .
+  ex:branch-main a pr:Branch ; schema:isPartOf ex:conversation .
+  ex:message-listing a sosa:ObservableProperty .
+  ex:reader-v1 a sosa:Procedure ; schema:name "Fixture reader version 1" .
+  ex:resolver-v1 a prov:Plan ; schema:name "Comparable revision, scoped overlay" .
+  ex:reader-runtime a sosa:Sensor, prov:SoftwareAgent .
+
+  # Bodies are exact UTF-8 strings for these tiny fictional captures. Real large
+  # payloads are immutable external blobs, declared in the export manifest.
+  ex:capture-1 a pr:Capture, pr:Representation, prov:Entity ;
+    schema:encodingFormat "application/json" ;
+    pr:capturedAt "2026-10-20T12:00:00Z"^^xsd:dateTime ;
+    pr:bodyText """{"revision":10,"messages":[{"id":"m1","text":"Hello"},{"id":"m2","text":"Keep this message 🌍"}]}""" .
+  ex:capture-2 a pr:Capture, pr:Representation, prov:Entity ;
+    schema:encodingFormat "application/json" ;
+    pr:capturedAt "2026-10-20T12:01:00Z"^^xsd:dateTime ;
+    pr:bodyText """{"revision":11,"partial":true,"messages":[{"id":"m1","text":"Hello, revised"}]}""" .
+
+  ex:attempt-1 a pr:ReadAttempt, prov:Activity ;
+    pr:state pr:Succeeded ; pr:procedure ex:reader-v1 ;
+    prov:wasAssociatedWith ex:reader-runtime ; prov:used ex:capture-1 ;
+    prov:startedAtTime "2026-10-20T12:00:00Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-10-20T12:00:01Z"^^xsd:dateTime .
+  ex:observation-1 a sosa:Observation, prov:Activity ;
+    pr:partOfAttempt ex:attempt-1 ;
+    sosa:madeBySensor ex:reader-runtime ; sosa:usedProcedure ex:reader-v1 ;
+    sosa:hasFeatureOfInterest ex:branch-main ;
+    sosa:observedProperty ex:message-listing ;
+    prov:used ex:capture-1 ; sosa:hasResult ex:baseline ;
+    sosa:resultTime "2026-10-20T12:00:01Z"^^xsd:dateTime .
+  ex:baseline a pr:AssertionGraph, sosa:Result, prov:Entity ;
+    prov:wasGeneratedBy ex:observation-1 ;
+    pr:scope ex:scope-main ; pr:coverage pr:Complete ;
+    pr:sourceRevision "10" ; pr:covers ex:m1, ex:m2 .
+
+  ex:attempt-2 a pr:ReadAttempt, prov:Activity ;
+    pr:state pr:Succeeded ; pr:procedure ex:reader-v1 ;
+    prov:wasAssociatedWith ex:reader-runtime ; prov:used ex:capture-2 ;
+    prov:startedAtTime "2026-10-20T12:01:00Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-10-20T12:01:01Z"^^xsd:dateTime .
+  ex:observation-2 a sosa:Observation, prov:Activity ;
+    pr:partOfAttempt ex:attempt-2 ;
+    sosa:madeBySensor ex:reader-runtime ; sosa:usedProcedure ex:reader-v1 ;
+    sosa:hasFeatureOfInterest ex:branch-main ;
+    sosa:observedProperty ex:message-listing ;
+    prov:used ex:capture-2 ; sosa:hasResult ex:overlay ;
+    sosa:resultTime "2026-10-20T12:01:01Z"^^xsd:dateTime .
+  ex:overlay a pr:AssertionGraph, sosa:Result, prov:Entity ;
+    prov:wasGeneratedBy ex:observation-2 ;
+    pr:scope ex:scope-main ; pr:coverage pr:Partial ;
+    pr:sourceRevision "11" ; pr:covers ex:m1 .
+
+  ex:scope-main a pr:CoverageScope ;
+    pr:subject ex:conversation ; pr:branch ex:branch-main ;
+    pr:domain ex:message-listing .
+
+  # A recorded running attempt has no result yet. Import preserves this history;
+  # its old owner epoch does not establish liveness in a restored host.
+  ex:attempt-3 a pr:ReadAttempt, prov:Activity ;
+    pr:state pr:Running ; pr:ownerEpoch "fixture-runtime-1" ;
+    pr:procedure ex:reader-v1 ; pr:target ex:branch-main ;
+    prov:wasAssociatedWith ex:reader-runtime ;
+    prov:startedAtTime "2026-10-20T12:02:00Z"^^xsd:dateTime .
+
+  ex:resolution-2 a pr:ResolutionActivity, prov:Activity ;
+    pr:policy ex:resolver-v1 ; prov:used ex:baseline, ex:overlay ;
+    prov:generated ex:resolved-2, ex:support-2 ;
+    pr:reason "Complete R10 baseline with R11 overlay for m1; no R11 completeness claim" .
+}
+
+ex:baseline {
+  ex:m1 a schema:Message ; schema:isPartOf ex:conversation ;
+    schema:text "Hello" ; pr:role "user" .
+  ex:m2 a schema:Message ; schema:isPartOf ex:conversation ;
+    schema:text "Keep this message 🌍" ; pr:role "assistant" .
+  ex:membership-m1 a pr:Membership ;
+    pr:branch ex:branch-main ; pr:member ex:m1 ; pr:position 1 .
+  ex:membership-m2 a pr:Membership ;
+    pr:branch ex:branch-main ; pr:member ex:m2 ; pr:position 2 .
+}
+
+ex:overlay {
+  ex:m1 a schema:Message ; schema:isPartOf ex:conversation ;
+    schema:text "Hello, revised" ; pr:role "user" .
+}
+
+ex:resolved-2 {
+  ex:m1 a schema:Message ; schema:isPartOf ex:conversation ;
+    schema:text "Hello, revised" ; pr:role "user" ;
+    pr:selectedRevision ex:m1-r11 .
+  ex:m1-r11 a pr:MessageRevision, prov:Entity ; prov:specializationOf ex:m1 .
+  ex:m2 a schema:Message ; schema:isPartOf ex:conversation ;
+    schema:text "Keep this message 🌍" ; pr:role "assistant" ;
+    pr:selectedRevision ex:m2-r10 .
+  ex:m2-r10 a pr:MessageRevision, prov:Entity ; prov:specializationOf ex:m2 .
+  ex:membership-m1 a pr:Membership ;
+    pr:branch ex:branch-main ; pr:member ex:m1 ; pr:position 1 .
+  ex:membership-m2 a pr:Membership ;
+    pr:branch ex:branch-main ; pr:member ex:m2 ; pr:position 2 .
+}
+
+ex:support-2 {
+  # Fine-grained support for the selected text; other fields have explicit
+  # shared source bindings below. Reification does not assert current triples;
+  # those triples appear in ex:resolved-2 above.
+  ex:m1-text-selection a pr:ResolutionSelection, rdf:Statement ;
+    rdf:subject ex:m1 ; rdf:predicate schema:text ; rdf:object "Hello, revised" ;
+    prov:wasDerivedFrom ex:overlay ; pr:policy ex:resolver-v1 .
+  ex:m2-text-selection a pr:ResolutionSelection, rdf:Statement ;
+    rdf:subject ex:m2 ; rdf:predicate schema:text ; rdf:object "Keep this message 🌍" ;
+    prov:wasDerivedFrom ex:baseline ; pr:policy ex:resolver-v1 .
+  ex:m1-r11 prov:wasDerivedFrom ex:overlay .
+  ex:m2-r10 prov:wasDerivedFrom ex:baseline .
+  ex:membership-m1 prov:wasDerivedFrom ex:baseline .
+  ex:membership-m2 prov:wasDerivedFrom ex:baseline .
+}
