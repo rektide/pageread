@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Connect the ontology-forward design with its precedents and parallel inquiry
+    title: Connect ontology and interface inquiry, then record the script-first product direction and installation research
+  - resource: /design/script-runtime/design0.gpt6a.md
+    title: One reader host, ATProto script discovery, lifecycle and companion PWA
   - resource: /design/otel-microdata/draft0.glm53m.md
     title: Original architecture and design journal
   - resource: /design/reactive-indexes/draft0.gpt6am.md
@@ -21,6 +23,14 @@ sources:
 ---
 
 # Pageread design reading map
+
+## Product and installation direction
+
+- [One host, discoverable scripts](./script-runtime/design0.gpt6a.md) — the
+  human's shift toward a script-installing reader extension, ATProto discovery
+  by origin/host/domain, local lifecycle tools, collections and a companion PWA.
+  Bespoke extension generation remains a secondary packaging target. Includes
+  current installation APIs and proposal-status distinctions.
 
 ## Ontology and portable knowledge
 

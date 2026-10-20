@@ -7,6 +7,8 @@ generated:
   at: "2026-10-20"
   by: "model:openai/gpt-6-astra#medium"
 sources:
+  - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
+    title: Repositioned extension building as a secondary collection-packaging path behind the script-installing host
   - resource: "opencode://ses_ea4d36447ffewTLi2X0SImAY6W"
     title: Baseline type repairs, module-preserving build, and packaged Chromium capture proof
   - resource: "../design/reactive-indexes/draft0.gpt6am.md"
@@ -17,6 +19,11 @@ sources:
 ---
 
 # Inspectable extension build
+
+**Role in the current direction:** this is packaging infrastructure for the
+Pageread host and optional bespoke extensions. The primary authoring unit is a
+reader script/recipe installed into the host; creating a reader should not
+require creating another extension. See [script discovery and lifecycle](../design/script-runtime/design0.gpt6a.md).
 
 From the repository root:
 

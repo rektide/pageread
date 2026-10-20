@@ -8,7 +8,9 @@ generated:
   by: "model:openai/gpt-6-astra"
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Commissioned the page-reader architecture, coordinated experiments and connected generated-reader publication
+    title: Commissioned experiments, connected generated-reader publication and redirected the product toward one host with discoverable installable scripts
+  - resource: "/design/script-runtime/design0.gpt6a.md"
+    title: Script-first direction, discovery scopes, lifecycle and companion PWA
   - resource: "/extension-build/README.md"
     title: Verified build mechanics and execution boundaries
   - resource: "/harness/README.md"
@@ -30,6 +32,22 @@ can process the next page, and readers can be shared through ATProto.
 The current implementation is an **experimental toolkit with runnable proofs**.
 It combines OTel-semconv-adapted trace items, conversation metadata, live DOM
 queries, MIME-typed content stores, named reactive indexes and RDF projections.
+
+## Product direction: one host, many scripts
+
+The primary product is **Pageread's reader extension**, which finds, retrieves,
+installs and runs reader scripts. Authors and agents create scripts/recipes for
+that host. ATProto carries discoverable reader records and payloads; a catalog
+indexes their declared origin/host/domain applicability. Local installation
+state pins a reader revision, configuration and enablement independently of its
+published record.
+
+Collections compose selected readers. Building a bespoke extension remains an
+optional output of a collection; it is no longer the main authoring workflow.
+A companion PWA can offer discovery, collection composition, shared-file intake
+and an offline Oxigraph workbench. The [script-first design](design/script-runtime/design0.gpt6a.md)
+records the lifecycle, matching distinctions and relevant installation specs.
+This direction is ahead of the implemented fixture and isolated proofs below.
 
 ## Try something
 

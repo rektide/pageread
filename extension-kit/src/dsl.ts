@@ -1,7 +1,8 @@
 /**
- * The extension-building DSL: a declarative ExtensionSpec that the
- * codegen (@pageread/extension-build) compiles into WXT entrypoints and
- * the kit runtime executes. Readers turn captures into store puts,
+ * Packaged reader and host declarations. ReaderSpec is the author-facing
+ * interpretation boundary; ExtensionSpec groups readers for a host build.
+ * No general extension code generator is implemented here. Reader scripts
+ * acquired at runtime use a separate runtime adapter. Readers produce store puts,
  * content-index entries, and — per the astra-medium review — explicit
  * observation envelopes: capture completeness is first-class data, and a
  * partial observation never implies deletion.
