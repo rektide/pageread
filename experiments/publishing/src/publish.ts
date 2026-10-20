@@ -76,9 +76,30 @@ export async function readback(agent: Agent, repo: string, rkey: string, prepare
   const record = jsonToLex(lexToJson(result.value)) as Prepared['record'];
   catalog(prepared.names).assertValidRecord(prepared.record.$type, record);
   if (!isDeepStrictEqual(lexToJson(record), lexToJson(prepared.record))) throw new Error('Record readback differs');
-  const response = await agent.com.atproto.sync.getBlob({ did: repo, cid: record.payload.ref.toString() });
-  const bytes = response.data;
-  bounded(bytes);
+  // The generated SDK decodes text/javascript as text despite getBlob's Uint8Array
+  // type. Use the same authenticated transport, retaining the exact bytes instead.
+  const query = new URLSearchParams({ did: repo, cid: record.payload.ref.toString() });
+  const response = await agent.fetchHandler(`/xrpc/com.atproto.sync.getBlob?${query}`, { method: 'GET' });
+  if (!response.ok) throw new Error(`Blob read failed: HTTP ${response.status}`);
+  if (!response.body) throw new Error('Missing blob body');
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > limits.bytes || size > record.payload.size) {
+        await reader.cancel();
+        throw new Error('Downloaded blob exceeds byte limit');
+      }
+      chunks.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
   if (!(await cidForRawBytes(bytes)).equals(record.payload.ref) || bytes.byteLength !== record.payload.size) throw new Error('Blob readback differs');
   return { ...result, record, bytes };
 }
