@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Connect ontology, sensor routines, blackboard production, interface inquiry and the script-first product direction
+    title: Connect ontology, sensor routines, private-blackboard thesis and work protocols, interface inquiry, and the script-first product direction
+  - resource: /design/blackboard/README.md
+    title: Integrating virtual-blackboard architecture and focused item/work protocols
   - resource: /design/observation-queries/blackboard0.gpt6a.md
     title: Proactive factories, pending telemetry content, receiving stores and export operations
   - resource: /design/observation-queries/sensor-routines0.gpt6a.md
@@ -29,6 +31,13 @@ sources:
 ---
 
 # Pageread design reading map
+
+## Integrating architecture
+
+- [Virtual page blackboard](./blackboard/README.md) — the larger thesis and its
+  small parts: a private item graph, worker selectors, received/work children,
+  explicit rejection and completion records, and an owned view that leaves the
+  source page DOM unaugmented by default.
 
 ## Product and installation direction
 

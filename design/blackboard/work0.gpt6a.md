@@ -156,9 +156,11 @@ policies. A received work record is created or recovered before invoking the
 implementation. For a durable work guarantee, that boundary itself is committed
 before acknowledging receipt or beginning an externally visible effect.
 
-An activation key binds definition/configuration, input references and requested
-purpose. Redelivery uses the recorded activation and returns the existing account.
-An explicit new probe can create a fresh activation even for equal input values.
+An activation key identifies one scheduled/requested occasion and is bound to its
+definition/configuration, input references, and purpose. Redelivery uses that
+recorded activation and returns the existing account. Automatic eligibility can
+be deduplicated by a declared rule/input key; an explicit new probe creates a
+fresh activation even for equal input values.
 Input-dependent scheduling decides whether new content warrants new work; a batch
 ID alone is not the lifetime key of a long-lived child sensor.
 

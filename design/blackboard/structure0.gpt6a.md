@@ -83,6 +83,11 @@ attachments have their own revisions. Appending `received` or `rejected` does no
 advance the source-content revision or invalidate an input-dependent worker.
 Work-aware queries explicitly depend on the operational neighborhood.
 
+Keep source-node identity in realm-local maps and retained anchor descriptions.
+Do not assign attributes or insert elements into the source DOM merely to carry
+our IDs. The virtual item can have an identity even when the source element has
+no native ID.
+
 ## 4. Proposed private view
 
 The following XML is a **virtual-document sketch**, with an illustrative profile
@@ -98,6 +103,13 @@ namespace. It is not intended to be inserted into the observed page:
       <pr:produces profile="normalized-message/v0" />
       <pr:module artifact="reader-artifact-r3" export="readMessage" />
     </pr:worker>
+    <pr:worker id="image-reader" definition="image-reader-v2">
+      <pr:selector id="image-selection" kind="CssSelector"
+                   source="page-snapshot-7" value="article[data-message-id]" />
+      <pr:accepts profile="image-entry/v1" />
+      <pr:produces profile="normalized-image/v0" />
+      <pr:module artifact="image-reader-artifact-r2" export="readImage" />
+    </pr:worker>
   </pr:workers>
 
   <pr:entry id="entry-42" entity="message-42" content-revision="r7" batch="b12">
@@ -112,7 +124,7 @@ namespace. It is not intended to be inserted into the observed page:
       </pr:attempt>
     </pr:received>
     <pr:received id="work-10" worker="image-reader" input-revision="r7"
-                 phase="rejected">
+                 selector="image-selection" phase="rejected">
       <pr:decision id="decision-10" sequence="1" disposition="rejected"
                    code="unsupported-input-profile">
         <pr:reason>Expected an image entry; received a message entry.</pr:reason>
@@ -126,6 +138,11 @@ The `received` element renders the stable engagement/work record. Its current
 `phase` is a convenient summary of its decisions and attempt events. The element
 does not need to be renamed when execution starts or finishes. Rejection can
 settle it without any processing attempt.
+
+The two example selectors deliberately identify the same broad candidate. Their
+different acceptance profiles explain why one processes it and the other records
+a rejection. A real worker can use a more selective candidate query; this sketch
+does not prescribe delivering every item to every worker.
 
 An HTML exposure uses valid custom-element names such as `pr-worker` and
 `pr-received`, with full closing tags. A microdata exposure supplies actual
@@ -160,9 +177,12 @@ does not withdraw that record from the blackboard.
 ## 6. Appending is a host operation
 
 A worker proposes an attachment under an identified parent and receives an ID and
-revision/receipt. The host checks the expected parent/input revision, allocates
-or reuses identity according to the operation key, records the change, and
-notifies affected views under the declared persistence contract.
+revision/receipt. The host checks the pinned input's identity/revision and the
+expected work revision, allocates or reuses identity according to the operation
+key, records the change, and notifies affected views under the declared persistence
+contract. Recording an old-input completion as history does not require that
+input to remain the current head. Advancing a selected current output does require
+the appropriate current-input/generation precondition.
 
 The worker owns its declared attachment/output scope. Shared input properties and
 other workers' records do not become arbitrary mutable scratch fields. This

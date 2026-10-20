@@ -135,6 +135,10 @@ The graph may advertise an output before its body exists. A declared transcript,
 annotation set, or telemetry representation can be waiting, building, ready, or
 failed. A failed new production can leave an earlier ready revision usable.
 
+An item describing code or a worker becomes executable through the host's
+installed/enabled definition and activation policy. Observing worker-like markup
+on a source page does not itself register or activate a worker.
+
 ### Work leaves a local account
 
 When a worker actually receives a candidate input, it creates an identified

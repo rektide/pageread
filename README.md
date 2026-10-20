@@ -8,7 +8,9 @@ generated:
   by: "model:openai/gpt-6-astra"
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Commissioned experiments, connected generated-reader publication and redirected the product toward one host with discoverable installable scripts
+    title: Commissioned experiments and reader publication, shaped the script-first product, and developed the virtual-blackboard architecture
+  - resource: "/design/blackboard/README.md"
+    title: Integrating architecture with private item/work structure and received/rejection protocols
   - resource: "/design/script-runtime/design0.gpt6a.md"
     title: Script-first direction, discovery scopes, lifecycle and companion PWA
   - resource: "/extension-build/README.md"
@@ -101,6 +103,8 @@ token-AND, not literal browser find.
 
 ## Inquiry
 
+- [Virtual page blackboard](design/blackboard/README.md): the integrating thesis,
+  private item graph, and received/work children with explicit outcomes.
 - [First reactive-index review](design/reactive-indexes/draft0.gpt6am.md)
 - [Hybrid resolver and RDF revision](design/reactive-indexes/draft1.gpt6am.md)
 - [Initial architecture and preserved simplification history](design/otel-microdata/draft0.glm53m.md)

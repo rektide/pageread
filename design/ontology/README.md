@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Commission, ontology-forward design, graph round-trip verification, and connections to observation-query and annotation tools
+    title: Ontology-forward design, graph verification, and connections to observation-query tools and the virtual-blackboard architecture
+  - resource: /design/blackboard/README.md
+    title: Private semantic working surface integrating items, workers, and child work records
   - resource: /design/ontology/design0.gpt6a.md
     title: Proposed ontology, semantic authority, reactive views, host publication, and portable export
   - resource: /design/ontology/observations0.gpt6a.trig
@@ -68,6 +70,9 @@ Uses the existing installation under `experiments/graphs`. The design records
 
 ## Related inquiry
 
+- [Virtual page blackboard](../blackboard/README.md) — an integrating architecture
+  over this semantic model, with private item rendering and explicit received/work
+  children. It keeps source content separate from operational attachments.
 - [Observation queries and annotations](../observation-queries/README.md) —
   specializes procedures/results into live-query batches and annotation tools;
   connects data shapes and executable factories with recovered DepIn-O work.

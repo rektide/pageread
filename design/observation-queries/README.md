@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Sensor/query authoring and examples, then blackboard production, pending telemetry content, export actions and receiving stores
+    title: Sensor/query authoring and examples, blackboard production and receiving stores, connected to the private item graph and received-work architecture
+  - resource: /design/blackboard/README.md
+    title: Integrating blackboard thesis, virtual child structure, and received-work protocol
   - resource: /design/observation-queries/blackboard0.gpt6a.md
     title: Proactive content-producing factories, blackboard coordination and Oxigraph ingestion/export roles
   - resource: /design/observation-queries/sensor-routines0.gpt6a.md
@@ -71,6 +73,9 @@ not a shipped live-query or factory runtime.
 
 ## Connections
 
+- [Virtual page blackboard](../blackboard/README.md): the integrating architecture
+  places these sensors, selectors, batches, and producers in a private item graph;
+  workers leave received/work children beneath the entries they engage with.
 - [Ontology-forward design](../ontology/README.md): the broader observation,
   provenance, resolution, and portable-dataset model extended here.
 - [Tabula-rasa design](../tabula-rasa/design0.gpt6a.md): observation-session

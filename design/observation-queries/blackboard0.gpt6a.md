@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Human identifies the blackboard/factory production role, pending telemetry outputs, export operations and the Oxigraph receiver/writer
+    title: Human identifies blackboard production and receiving stores, then extends the direction into a private item graph with received/work children
+  - resource: /design/blackboard/thesis0.gpt6a.md
+    title: Subsequent integrating thesis; preserves this production account and adds virtual item/work structure
   - resource: /design/observation-queries/sensor-routines0.gpt6a.md
     title: Sensors, processors, entry templates, factory construction and lifetime bindings
   - resource: /design/observation-queries/design0.gpt6a.md#8-code-shapes-and-factories-that-take-data
@@ -23,6 +25,12 @@ sources:
 # Blackboard production, pending content, and receiving stores
 
 [Module map](./README.md) · [Sensor routines](./sensor-routines0.gpt6a.md)
+
+The later [virtual-blackboard thesis](../blackboard/thesis0.gpt6a.md) integrates
+this production model with a private microdata/item view. Its small parts define
+[work-child structure](../blackboard/structure0.gpt6a.md) and the
+[received/work protocol](../blackboard/work0.gpt6a.md), including explicit rejection
+reasons. This earlier note continues to own the production/receiver/export argument.
 
 ## The missing role
 
