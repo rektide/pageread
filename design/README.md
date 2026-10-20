@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Connect ontology, query/annotation/factory work, interface inquiry, and the script-first product direction
+    title: Connect ontology, sensor-first query/annotation/factory work, interface inquiry, and the script-first product direction
+  - resource: /design/observation-queries/sensor-routines0.gpt6a.md
+    title: Sensor routines, declarative selection, module processors, and entry-triggered factories
   - resource: /design/observation-queries/README.md
     title: SOSA queries, microdata structure, batch identities, agentic annotation tools, and factory dependencies
   - resource: /design/script-runtime/design0.gpt6a.md
@@ -36,6 +38,9 @@ sources:
 
 ## Ontology and portable knowledge
 
+- [Sensor routines](./observation-queries/sensor-routines0.gpt6a.md) — a focused
+  authoring direction: sensors as queries producing values, HTML/XML recipe
+  structure, executable module leaves, and templates waiting for keyed entries.
 - [Observation queries and annotations](./observation-queries/README.md) — query
   procedures, nested selectors, microdata occurrence structure, identified result
   batches, an agentic annotation kit, and data-consuming factories. Includes FX's

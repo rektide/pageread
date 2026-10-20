@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Query-as-SOSA direction, annotation-kit design, structural batches, factory contracts, and verified example integration
+    title: Query-as-SOSA and sensor-first authoring, annotation tools, structural batches, factory contracts, and verified example integration
+  - resource: /design/observation-queries/sensor-routines0.gpt6a.md
+    title: Sensor-first routines in HTML/XML, module leaves, and entry-triggered child bindings
   - resource: "opencode://ses_ea4bc04caffe3ibHrNRHIVRsJM"
     title: FX recovery of DepIn-O and local RDF dependency/code-structure precedents
   - resource: /design/observation-queries/design0.gpt6a.md
@@ -25,6 +27,10 @@ sources:
 **Define a query, find what it can observe, identify the result batch, and give
 an agent tools to annotate both the content and the machinery.**
 
+- [Sensor-first refinement](./sensor-routines0.gpt6a.md): start with a sensor as
+  a query that produces values. Mint declarative routines, bind executable module
+  leaves, and use entry templates to create/update independently owned children.
+  Includes proposed HTML/custom-element authoring syntax and factory semantics.
 - [Design](./design0.gpt6a.md): a query definition as `sosa:Procedure`, its
   evaluator as `sosa:Sensor`, each evaluation as `sosa:Observation`, and result
   batches as identified `sosa:Result`/`prov:Collection` resources.
