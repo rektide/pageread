@@ -1,0 +1,19 @@
+{
+  "name": "@pageread/reader-loop-experiment",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "demo": "node demo.ts",
+    "test": "node --test test/*.test.ts",
+    "check": "tsgo --noEmit"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.5",
+    "@typescript/native-preview": "7.0.0-dev.20260707.2",
+    "jsdom": "^30.1.3",
+    "msw": "^3.0.3"
+  }
+}
