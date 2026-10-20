@@ -16,7 +16,7 @@ const server = setupServer(http.post("https://agent.example/reader", async ({ re
   if (!body.prompt.includes("Explain named graphs")) return new HttpResponse(null, { status: 400 });
   return HttpResponse.json({ code });
 }));
-server.listen({ onUnhandledRequest: "error" });
+server.listen({ onUnhandledFrame: "error" });
 const dom = new JSDOM(html, { runScripts: "outside-only" });
 try {
   const registry = await fileRegistry(".data");

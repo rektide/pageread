@@ -22,7 +22,7 @@ test("HTTP dispatch carries evidence; generated reader executes against fixture 
     assert.ok(payload.prompt.includes(request.page.body.replaceAll('"', '\\"')));
     return HttpResponse.json({ code: "Array.from(document.querySelectorAll('[data-id]'), el => el.textContent)" });
   }));
-  server.listen({ onUnhandledRequest: "error" });
+  server.listen({ onUnhandledFrame: "error" });
   const dom = new JSDOM(request.page.body, { runScripts: "outside-only" });
   try {
     const registry = await fileRegistry(directory);
