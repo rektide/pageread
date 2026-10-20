@@ -1,0 +1,22 @@
+{
+  "name": "@pageread/graph-experiments",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "oxigraph": "^0.5.12"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "fake-indexeddb": "^6.2.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vite-plugin-wasm": "^3.6.0",
+    "vitest": "^5.0.5"
+  }
+}
