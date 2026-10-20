@@ -17,6 +17,8 @@ export type Coverage = "complete" | "partial" | "unknown";
  * downstream may treat absence-in-a-partial-capture as deletion.
  */
 export interface ObservationEnvelope {
+	/** The semantic universe for completeness; required before persistence. */
+	scope: { conversationUri: string; domain: "messages" | "title" | "conversation"; branch?: string };
 	coverage: Coverage;
 	/** entity ids this observation actually saw (e.g. message node ids) */
 	covers?: string[];
@@ -57,6 +59,7 @@ export interface ReaderResult {
 
 export interface ReaderSpec {
 	name: string;
+	version: string;
 	match(capture: Capture): boolean;
 	read(capture: Capture, ctx: ReaderContext): Promise<ReaderResult> | ReaderResult;
 }

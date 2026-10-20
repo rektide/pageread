@@ -1,55 +1,35 @@
-/**
- * SSE (text/event-stream) parsing off a ReadableStream, per the WHATWG
- * spec's field lines, with multi-line `data:` joins. Emits one event per
- * `data:`-terminated block; `event:`, comments, `id:`, `retry:` handled
- * (id/retry ignored for capture purposes).
- */
+/** WHATWG event-stream framing: CR, LF, CRLF; incomplete EOF event is discarded. */
+export interface SseEvent { event?: string; data: string }
 
-export interface SseEvent {
-	event?: string;
-	data: string;
-}
-
-export async function consumeSseStream(
-	stream: ReadableStream<Uint8Array>,
-	onEvent: (event: SseEvent) => void,
-): Promise<void> {
+export async function consumeSseStream(stream: ReadableStream<Uint8Array>, onEvent: (event: SseEvent) => void): Promise<void> {
 	const reader = stream.getReader();
 	const decoder = new TextDecoder();
-	let buffer = "";
+	let line = "", skipLf = false, event: string | undefined;
+	let data: string[] = [];
+	const finishLine = () => {
+		if (line === "") {
+			if (data.length) onEvent({ event, data: data.join("\n") });
+			data = []; event = undefined;
+		} else if (!line.startsWith(":")) {
+			const colon = line.indexOf(":");
+			const field = colon < 0 ? line : line.slice(0, colon);
+			let value = colon < 0 ? "" : line.slice(colon + 1);
+			if (value.startsWith(" ")) value = value.slice(1);
+			if (field === "data") data.push(value);
+			if (field === "event") event = value;
+		}
+		line = "";
+	};
 	try {
 		for (;;) {
-			const { done, value } = await reader.read();
-			if (done) break;
-			buffer += decoder.decode(value, { stream: true });
-			// events are separated by blank lines; tolerate \r\n
-			let boundary: number;
-			while ((boundary = buffer.search(/\r?\n\r?\n/)) !== -1) {
-				const block = buffer.slice(0, boundary);
-				buffer = buffer.slice(boundary + (buffer.slice(boundary).startsWith("\r\n\r\n") ? 4 : 2));
-				const parsed = parseBlock(block);
-				if (parsed) onEvent(parsed);
+			const { value, done } = await reader.read();
+			const text = done ? decoder.decode() : decoder.decode(value, { stream: true });
+			for (const char of text) {
+				if (skipLf && char === "\n") { skipLf = false; continue; }
+				skipLf = char === "\r";
+				if (char === "\r" || char === "\n") finishLine(); else line += char;
 			}
+			if (done) break;
 		}
-		const tail = parseBlock(buffer);
-		if (tail) onEvent(tail);
-	} finally {
-		reader.releaseLock();
-	}
-}
-
-function parseBlock(block: string): SseEvent | undefined {
-	let event: string | undefined;
-	const dataLines: string[] = [];
-	for (const rawLine of block.split(/\r?\n/)) {
-		if (rawLine === "" || rawLine.startsWith(":")) continue;
-		const colon = rawLine.indexOf(":");
-		const field = colon === -1 ? rawLine : rawLine.slice(0, colon);
-		let value = colon === -1 ? "" : rawLine.slice(colon + 1);
-		if (value.startsWith(" ")) value = value.slice(1);
-		if (field === "data") dataLines.push(value);
-		else if (field === "event") event = value;
-	}
-	if (dataLines.length === 0) return undefined;
-	return { event, data: dataLines.join("\n") };
+	} finally { reader.releaseLock(); }
 }

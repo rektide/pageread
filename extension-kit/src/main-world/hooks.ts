@@ -8,6 +8,8 @@ import { captureId, globMatch, type Capture } from "../capture.ts";
 import { consumeSseStream } from "./sse.ts";
 
 export interface HookOptions {
+	methods?: string[];
+	onError?: (error: unknown) => void;
 	/** glob patterns; unmatched URLs pass through unhooked */
 	include?: string[];
 	/** default true */
@@ -39,6 +41,7 @@ export function installNetworkHooks(emit: (capture: Capture) => void, opts?: Hoo
 	const include = opts?.include;
 	const captureBodies = opts?.captureBodies ?? true;
 	const maxBytes = opts?.maxBodyBytes ?? 5 * 1024 * 1024;
+	const report = opts?.onError ?? ((error: unknown) => console.error("pageread capture failed", error));
 	const relevant = (url: string): boolean =>
 		include === undefined || include.some((pattern) => globMatch(pattern, url));
 	const clip = (body: string): string => (body.length <= maxBytes ? body : body.slice(0, maxBytes));
@@ -62,7 +65,8 @@ export function installNetworkHooks(emit: (capture: Capture) => void, opts?: Hoo
 		} catch {
 			return originalFetch(input as RequestInfo, init);
 		}
-		if (url === undefined || !relevant(url)) return originalFetch(input as RequestInfo, init);
+		if (url !== undefined) url = new URL(url, globalThis.location?.href).href;
+		if (url === undefined || !relevant(url) || (opts?.methods && !opts.methods.includes(method))) return originalFetch(input as RequestInfo, init);
 
 		const startedAt = Date.now();
 		const id = captureId(url, startedAt);
@@ -93,8 +97,8 @@ export function installNetworkHooks(emit: (capture: Capture) => void, opts?: Hoo
 
 		const responseHeaders = headersToObject(response.headers);
 		const contentType = response.headers.get("content-type") ?? "";
-		if (contentType.includes("text/event-stream") && response.body) {
-			const [live, tap] = response.body.tee();
+		if (captureBodies && contentType.includes("text/event-stream") && response.body) {
+			const tap = response.clone().body!;
 			void consumeSseStream(tap, (event) => {
 				emit({
 					kind: "sse",
@@ -106,7 +110,7 @@ export function installNetworkHooks(emit: (capture: Capture) => void, opts?: Hoo
 					receivedAt: Date.now(),
 				});
 			})
-				.catch(() => {})
+				.catch(report)
 				.finally(() => {
 					emit({
 						kind: "http",
@@ -121,11 +125,7 @@ export function installNetworkHooks(emit: (capture: Capture) => void, opts?: Hoo
 						via: "fetch",
 					});
 				});
-			return new Response(live, {
-				status: response.status,
-				statusText: response.statusText,
-				headers: response.headers,
-			});
+			return response;
 		}
 
 		if (captureBodies && response.body) {
@@ -147,7 +147,8 @@ export function installNetworkHooks(emit: (capture: Capture) => void, opts?: Hoo
 						via: "fetch",
 					});
 				})
-				.catch(() => {
+				.catch((error) => {
+					report(error);
 					emit({
 						kind: "http",
 						id,
@@ -192,7 +193,7 @@ export function installNetworkHooks(emit: (capture: Capture) => void, opts?: Hoo
 			}
 			open(method: string, url: string | URL, ...rest: unknown[]): void {
 				this.__method = String(method).toUpperCase();
-				this.__url = String(url);
+				this.__url = new URL(String(url), globalThis.location?.href).href;
 				// @ts-expect-error passthrough variadic
 				super.open(method, url, ...rest);
 			}

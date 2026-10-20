@@ -5,9 +5,7 @@
 	"license": "MIT",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts",
-		"./bridge": "./src/bridge/index.ts",
-		"./sw": "./src/sw/index.ts"
+		".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
 	},
 	"scripts": {
 		"build": "tsdown",

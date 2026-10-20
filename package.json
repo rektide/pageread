@@ -8,15 +8,17 @@
 	"private": true,
 	"packageManager": "pnpm@12.7.0",
 	"scripts": {
-		"build": "concurrently 'pnpm:build:*'",
-		"build:libs": "pnpm --filter './{schema,signals,store,extension-kit,extension-build,indexer}' build",
+		"build": "pnpm run build:libs && pnpm run build:extension && pnpm --filter @pageread/extension-build verify",
+		"build:libs": "pnpm -r --filter @pageread/schema --filter @pageread/signals --filter @pageread/store --filter @pageread/indexer --filter @pageread/extension-kit build",
+		"build:extension": "pnpm --filter @pageread/fixture-extension build",
+		"dev": "pnpm run build:libs && pnpm --filter @pageread/fixture-extension dev",
 		"check": "concurrently 'pnpm:check:*'",
-		"check:types": "pnpm -r check:types",
-		"check:lint": "oxlint .",
+		"check:types": "pnpm -r --if-present check:types",
+		"check:lint": "oxlint schema signals store indexer extension-kit extension-build extensions harness",
 		"fix:fmt": "oxfmt",
-		"check:fmt": "oxfmt --check",
-		"test": "pnpm -r test",
-		"test:e2e": "pnpm -r test:e2e"
+		"check:fmt": "oxfmt --check schema signals store indexer extension-kit extension-build extensions harness package.json pnpm-workspace.yaml tsconfig.base.json",
+		"test": "pnpm -r --if-present test",
+		"test:e2e": "pnpm build && pnpm --filter @pageread/browser-harness test:e2e"
 	},
 	"keywords": [
 		"otel",
