@@ -162,3 +162,44 @@ First real wave in this repo; prior state was the README sketch plus an
 empty `pageread.ts`. Schema/signals/store/indexer cores are committed
 with tests green (31 tests). Extension kit, DSL/WXT machinery, crates,
 and the delegated chatgpt extension + harness are next.
+
+## Addendum — design journal: the finder split (and a loss)
+
+The indexer API first declared `find?(snapshot, query)` — find as a pure
+function of the *persisted* snapshot:
+
+```ts
+find?(snapshot: S, query: string): FindMatch[]
+```
+
+That signature forced a lie: snapshots are deliberately lean (they must
+persist and export as MIME-typed documents), but the ctrl+F payload —
+message text, titles — lives in the trace documents the snapshot points
+at. The first `transcripts.ts` hid this with closures (`entriesFor`,
+`rebuildTextIndex` referenced before definition) whose entry feed was
+empty, so find would have silently returned `[]` forever. The correction
+split the concern:
+
+```ts
+build(entries, prev, ctx): S                                // lean, persisted
+makeFinder?(entries, snapshot): (query) => FindMatch[]      // fat, in-memory
+```
+
+Tradeoffs stated: finders are process-local (one refresh after restart
+before find answers; each context holds its own), and the API admits
+find is instance state, not a pure function.
+
+The first factory draft also carried `inflight` promise-chaining and
+`lastSnapshotEntry` juggling; both were unnecessary (refreshes are
+idempotent full rebuilds; self-feedback is already excluded by URI
+filters on both the entry scan and the event subscription) and were
+deleted in a simplification pass.
+
+**Process lesson, recorded at the operator's prompting:** none of these
+pre-simplification states were ever committed — the overwritten drafts
+survive only in the commissioning session
+(`opencode://ses_ea538b494ffej4MXIdPDIIDTLU`). Going forward: checkpoint
+honest intermediate states before revamps, and commit revisions
+separately with their delta and destination explained. This addendum is
+the compensation, not a substitute — the journal keeps the argument; the
+history keeps only its conclusion.
