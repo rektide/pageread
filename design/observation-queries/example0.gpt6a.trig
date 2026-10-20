@@ -1,0 +1,170 @@
+# Fictional data model, not an implemented live-query/annotation runtime.
+# Generated 2026-10-20 by model:openai/gpt-6-astra#xhigh.
+# Source: opencode://ses_ea538b494ffej4MXIdPDIIDTLU
+@prefix ex: <urn:pageread:selection-example:> .
+@prefix pr: <https://example.org/pageread/vocab/0#> .
+@prefix oa: <http://www.w3.org/ns/oa#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix fno: <https://w3id.org/function/ontology#> .
+@prefix depin: <https://w3id.org/depin-o#> .
+
+ex:definitions {
+  pr:hasEntry a owl:ObjectProperty ;
+    rdfs:subPropertyOf prov:hadMember ; owl:inverseOf pr:inBatch .
+  pr:inBatch a owl:ObjectProperty .
+
+  ex:query-v1 a sosa:Procedure ;
+    pr:selector ex:allMessages ; pr:outputShape ex:MessageShape ;
+    pr:observedProperty ex:messageOccurrences ;
+    pr:ordering "document-order" .
+  ex:allMessages a oa:CssSelector ;
+    rdf:value "article[data-message-id]" .
+  ex:query-empty-v1 a sosa:Procedure ; pr:selector ex:noMatches .
+  ex:noMatches a oa:CssSelector ; rdf:value ".not-present" .
+  ex:messageOccurrences a sosa:ObservableProperty .
+  ex:query-sensor a sosa:Sensor, prov:SoftwareAgent ;
+    sosa:observes ex:messageOccurrences .
+
+  ex:MessageShape a sh:NodeShape ; sh:property ex:authorField .
+  ex:authorField a sh:PropertyShape ;
+    sh:path schema:author ; sh:node ex:AuthorShape .
+  ex:AuthorShape a sh:NodeShape ; sh:property ex:nameField .
+  ex:nameField a sh:PropertyShape ;
+    sh:path schema:name ; sh:datatype xsd:string ; sh:minCount 1 .
+  ex:authorBinding a pr:PropertyBinding ; pr:itempropName "author" ;
+    pr:expandedPredicate schema:author ; pr:shape ex:authorField .
+  ex:nameBinding a pr:PropertyBinding ; pr:itempropName "name" ;
+    pr:expandedPredicate schema:name ; pr:shape ex:nameField .
+}
+
+ex:captures {
+  ex:pageSnapshot1 a pr:Representation, prov:Entity ;
+    schema:encodingFormat "text/html" ;
+    pr:bodyText """<main>
+<article id="message1" data-message-id="m1" itemscope itemtype="https://schema.org/Message" itemid="urn:pageread:selection-example:m1">
+  <span itemprop="text">A 🌍 useful claim.</span>
+  <span itemprop="author" itemscope itemtype="https://schema.org/Person" itemid="urn:pageread:selection-example:alice" itemref="external-name"></span>
+</article>
+<article id="message2" data-message-id="m2" itemscope itemtype="https://schema.org/Message" itemid="urn:pageread:selection-example:m2"><span itemprop="text">Another message.</span></article>
+<span id="external-name" itemprop="name">Alice</span>
+</main>""" .
+  ex:m1-text-r1 a pr:Representation, prov:Entity ;
+    schema:encodingFormat "text/plain" ;
+    pr:bodyText "A 🌍 useful claim." ;
+    pr:textExtractionProfile ex:messageText-v1 ;
+    prov:wasDerivedFrom ex:pageSnapshot1 .
+}
+
+ex:structure {
+  ex:messageItem a pr:MicrodataItemOccurrence ;
+    pr:denotes ex:m1 ; pr:sourceNode ex:messageElement ;
+    pr:itemTypeToken "https://schema.org/Message" ;
+    pr:propertyOccurrence ex:authorOccurrence .
+  ex:authorOccurrence a pr:PropertyOccurrence ;
+    pr:ownerItem ex:messageItem ; pr:itempropName "author" ;
+    pr:expandedPredicate schema:author ; pr:valueItem ex:authorItem ;
+    pr:sourceNode ex:authorElement ; pr:position 0 .
+  ex:authorItem a pr:MicrodataItemOccurrence ;
+    pr:denotes ex:alice ; pr:sourceNode ex:authorElement ;
+    pr:itemTypeToken "https://schema.org/Person" ;
+    pr:propertyOccurrence ex:nameOccurrence .
+  ex:nameOccurrence a pr:PropertyOccurrence ;
+    pr:ownerItem ex:authorItem ; pr:itempropName "name" ;
+    pr:expandedPredicate schema:name ; rdf:value "Alice" ;
+    pr:sourceNode ex:externalNameElement ; pr:position 0 ;
+    pr:viaTraversal ex:itemrefTraversal .
+  ex:itemrefTraversal a pr:ReferenceTraversal ;
+    pr:fromItem ex:authorItem ; pr:itemrefToken "external-name" ;
+    pr:targetNode ex:externalNameElement .
+  ex:messageElement a pr:SourceNode ; pr:snapshot ex:pageSnapshot1 ; pr:domParent ex:mainElement .
+  ex:authorElement a pr:SourceNode ; pr:snapshot ex:pageSnapshot1 ; pr:domParent ex:messageElement .
+  ex:externalNameElement a pr:SourceNode ; pr:snapshot ex:pageSnapshot1 ; pr:domParent ex:mainElement .
+  ex:mainElement a pr:SourceNode ; pr:snapshot ex:pageSnapshot1 .
+}
+
+ex:results {
+  ex:evaluation1 a sosa:Observation, prov:Activity ;
+    sosa:usedProcedure ex:query-v1 ; sosa:madeBySensor ex:query-sensor ;
+    sosa:hasFeatureOfInterest ex:page ; sosa:observedProperty ex:messageOccurrences ;
+    prov:used ex:pageSnapshot1 ; sosa:hasResult ex:batch42 ;
+    sosa:resultTime "2026-10-20T12:00:00Z"^^xsd:dateTime .
+  ex:batch42 a sosa:Result, prov:Collection ;
+    prov:wasGeneratedBy ex:evaluation1 ; pr:kind pr:Snapshot ;
+    pr:status pr:Sealed ; pr:distinctEntryCount 2 ;
+    pr:sourceRevision ex:pageSnapshot1 ; pr:coverage "fixture-root-only" .
+  ex:entry42-0 a pr:ResultEntry ; pr:inBatch ex:batch42 ;
+    pr:entity ex:m1 ; pr:representation ex:m1-text-r1 ; pr:position 0 .
+  ex:entry42-1 a pr:ResultEntry ; pr:inBatch ex:batch42 ;
+    pr:entity ex:m2 ; pr:position 1 .
+
+  ex:evaluation2 a sosa:Observation, prov:Activity ;
+    sosa:usedProcedure ex:query-empty-v1 ; sosa:madeBySensor ex:query-sensor ;
+    sosa:hasFeatureOfInterest ex:page ; sosa:observedProperty ex:messageOccurrences ;
+    prov:used ex:pageSnapshot1 ; sosa:hasResult ex:batch43 ;
+    sosa:resultTime "2026-10-20T12:00:01Z"^^xsd:dateTime .
+  ex:batch43 a sosa:Result, prov:Collection ;
+    prov:wasGeneratedBy ex:evaluation2 ; pr:kind pr:Snapshot ;
+    pr:status pr:Sealed ; pr:distinctEntryCount 0 ;
+    pr:sourceRevision ex:pageSnapshot1 ; pr:coverage "fixture-root-only" .
+}
+
+ex:annotations {
+  # Quote and position are alternatives selecting the same phrase, not two
+  # sequential refinements. Positions are Unicode code points in messageText-v1.
+  ex:messageSelector a oa:CssSelector ; rdf:value "#message1 [itemprop='text']" ;
+    oa:refinedBy ex:quoteSelector, ex:positionSelector .
+  ex:quoteSelector a oa:TextQuoteSelector ; oa:exact "useful claim" ;
+    oa:prefix "A 🌍 " ; oa:suffix "." .
+  ex:positionSelector a oa:TextPositionSelector ; oa:start 4 ; oa:end 16 .
+  ex:target1 a oa:SpecificResource ; oa:hasSource ex:pageSnapshot1 ;
+    oa:hasSelector ex:messageSelector ; pr:textExtractionProfile ex:messageText-v1 ;
+    prov:wasDerivedFrom ex:entry42-0 .
+  ex:annotation1 a oa:Annotation ; oa:hasTarget ex:target1 ;
+    oa:hasBody ex:body1 ; oa:motivatedBy oa:commenting ;
+    prov:wasGeneratedBy ex:annotationAttempt1 .
+  ex:body1 a oa:TextualBody ; rdf:value "This claim deserves a source." .
+  ex:annotationAttempt1 a prov:Activity ; prov:used ex:entry42-0 ;
+    prov:wasAssociatedWith ex:authoringAgent .
+  ex:authoringAgent a prov:SoftwareAgent .
+}
+
+ex:processors {
+  # Illustrative declarations only. DepIn-inspired requirements keep their own
+  # terms; the class-oriented provisional translation is a cited precedent.
+  pr:DependencyRequirement rdfs:seeAlso depin:Dependency, depin:InjectionPoint .
+  ex:queryFactory a fno:Function, pr:FactoryDefinition ;
+    fno:name "Create a live query sensor" ;
+    fno:expects ex:factoryInputs ; fno:returns ex:factoryOutputs ;
+    pr:acceptsShape ex:QueryDefinitionShape ;
+    pr:requires ex:routerRequirement, ex:selectorRequirement .
+  ex:factoryInputs rdf:first ex:queryParameter ; rdf:rest rdf:nil .
+  ex:queryParameter a fno:Parameter ; fno:predicate pr:configuration ;
+    fno:required true ; pr:shape ex:QueryDefinitionShape .
+  ex:factoryOutputs rdf:first ex:sensorOutput ; rdf:rest rdf:nil .
+  ex:sensorOutput a fno:Output ; fno:predicate pr:createdSensor ;
+    fno:type sosa:Sensor ; fno:required true .
+  ex:QueryDefinitionShape a sh:NodeShape ; sh:property ex:selectorField .
+  ex:selectorField a sh:PropertyShape ; sh:path pr:selector ;
+    sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI .
+
+  ex:factoryMapping a fno:Mapping ; fno:function ex:queryFactory ;
+    fno:implementation ex:factoryArtifact ;
+    pr:exportName "makeLiveQuery" .
+  ex:factoryArtifact a fno:Implementation ;
+    pr:modulePath "example/runtime/live-query.js" ;
+    pr:artifactRevision "illustrative-only-v1" ;
+    pr:runtimeProfile pr:BrowserDom .
+  ex:routerRequirement a pr:DependencyRequirement ;
+    pr:slot "router" ; pr:serviceContract pr:DOMMutationRouter ;
+    pr:lifetime pr:RealmRoot ; pr:required true .
+  ex:selectorRequirement a pr:DependencyRequirement ;
+    pr:slot "selectorEngine" ; pr:serviceContract pr:CssSelectorEvaluator ;
+    pr:lifetime pr:ReadingSession ; pr:required true .
+}

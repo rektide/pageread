@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Connect ontology and interface inquiry, then record the script-first product direction and installation research
+    title: Connect ontology, query/annotation/factory work, interface inquiry, and the script-first product direction
+  - resource: /design/observation-queries/README.md
+    title: SOSA queries, microdata structure, batch identities, agentic annotation tools, and factory dependencies
   - resource: /design/script-runtime/design0.gpt6a.md
     title: One reader host, ATProto script discovery, lifecycle and companion PWA
   - resource: /design/otel-microdata/draft0.glm53m.md
@@ -34,6 +36,10 @@ sources:
 
 ## Ontology and portable knowledge
 
+- [Observation queries and annotations](./observation-queries/README.md) — query
+  procedures, nested selectors, microdata occurrence structure, identified result
+  batches, an agentic annotation kit, and data-consuming factories. Includes FX's
+  rediscovery of DepIn-O/OOC-O and a verified RDF/CSS/annotation example.
 - [Ontology-forward pageread](./ontology/README.md) — SOSA/PROV observations,
   explicit resolution, OTel execution, Oxigraph hosts, reactive views, and
   portable dataset bundles. Includes a queryable TriG example and dump/reload

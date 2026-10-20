@@ -34,9 +34,23 @@ sources:
     title: Concept schemes and semantic relations, distinct from data-field structure
   - resource: https://w3id.org/function/spec/20230512/
     title: Unofficial FnO specification for functions, parameters, outputs, implementations, mappings, and executions
+  - resource: "opencode://ses_ea4bc04caffe3ibHrNRHIVRsJM"
+    title: FX rediscovery of DepIn-O, OOC-O, SPL, and software-process dependency precedents
+  - resource: file:///home/rektide/archive/doc/onto/depin-o.ttl
+    title: Local draft translation of Dependency Injection Ontology, including implementation selection and scopes
+  - resource: file:///home/rektide/archive/doc/onto/ooc.ttl
+    title: Local draft Object-Oriented Code Ontology translation for code constructs, methods, variables, and types
+  - resource: /design/observation-queries/dependencies0.gpt6a.md
+    title: Verified archive findings, source standing, and proposed factory-binding interpretation
+  - resource: /design/observation-queries/example0.gpt6a.trig
+    title: Fictional query, batch, microdata occurrence, annotation, and factory declaration dataset
+  - resource: /design/observation-queries/verify0.gpt6a.mjs
+    title: Executed graph round trips, fixture CSS matches, and annotation offset checks
 ---
 
 # Queries as observations, structures as data, annotations as tools
+
+[Module map](./README.md) · [Dependency precedents](./dependencies0.gpt6a.md)
 
 ## 1. The idea to preserve
 
@@ -94,6 +108,7 @@ snapshot. Source epochs and per-input revisions remain part of the result.
 | SKOS | Concept/tag vocabularies and broader/narrower/related discovery categories |
 | SOSA + PROV | Procedures, observations, outputs, execution, and derivation |
 | FnO | Implementation-independent callable descriptions and bindings to concrete implementations; an unofficial specification |
+| DepIn-O / OOC-O | Dependencies, injection/selection/lifetimes, and code declarations; local provisional translations require an explicit adaptation for functional factories |
 
 For “objects with fields/properties and nested structure,” **RDFS/OWL plus SHACL**
 is the useful combination. SKOS can organize categories of readers, selectors,
@@ -361,10 +376,65 @@ description from verified conformance. Factory configuration is data; created
 DOM handles, subscriptions, and cancellation controllers are runtime resources
 whose portable records describe their ownership rather than serialize them.
 
-The current search for the remembered **dep-in/depin dependency vocabulary** is
-intentionally left open in this checkpoint. That precedent may supply the
-requires/provides and factory-composition vocabulary. Do not fix those terms
-merely because FnO or SHACL is already available.
+### The recovered dependency precedent: DepIn-O
+
+FX found **DepIn-O**, the Dependency Injection Ontology, and its companion
+**OOC-O**, the Object-Oriented Code Ontology. The
+[research account](./dependencies0.gpt6a.md) records exact archive paths and
+source limitations. DepIn-O models dependency consumers, injection points,
+abstract dependencies, selected implementations, qualifier keys, decorators,
+and scopes. OOC-O describes code classes, methods, fields, and their types.
+
+This is the missing complementary perspective: a factory has **data arguments**
+and **provisioned services**, and its output may itself be a provider. FnO/shapes
+describe the data-facing contract; DepIn-O informs the service-binding plan.
+
+The local DepIn-O `Consumer` and `Dependency` are OOC-O code classes, and its
+implementation relation is framed through inheritance. A free JavaScript factory
+is not automatically an instance of those class-oriented concepts. Use direct
+terms for genuine OO code mappings; for our language-neutral runtime, publish
+an explicitly DepIn-inspired profile such as `FactoryDefinition`,
+`DependencyRequirement`, `ProviderBinding`, and `LifetimeScope`. Record the
+correspondence without asserting an unjustified `owl:equivalentClass`.
+
+Example factory declaration, expressed informally:
+
+```text
+makeLiveQuery
+  accepts: QueryDefinitionShape / application/json
+  provides: bound query sensor + disposable LiveQuery handle
+  needs:
+    router: DOMMutationRouter, shared within this realm/root scope
+    selectorEngine: CssSelector evaluator, compatible declared syntax/profile
+    identityMap: source-node identities for this document epoch
+  implementation: exact artifact revision + export binding
+  lifetime: query-owner lease; final release returns shared service leases
+```
+
+The router can therefore be shared across several factories/queries through
+the declared scope—the ontology gives our original event-router requirement a
+provisioning description. Scope is a runtime identity, not the word `singleton`
+standing for the entire browser. A request scope in a DI framework and one SOSA
+observation are only analogous until an explicit lifecycle mapping establishes
+their relationship.
+
+The proposed tools are `processors.find`, `processors.describe`,
+`factories.plan`, `factories.create`, and `instances.dispose`. Planning returns
+selected artifact/implementation IDs, named data bindings, dependency providers,
+lifetime owners, and unresolved requirements. Creation consumes that pinned plan;
+it does not silently switch providers as the registry changes. A code reference
+has a resolver/runtime adapter, consistent with the script-installation model.
+
+Composition connects a named output to a named input when their declared profiles
+match or an explicit adapter bridges them. Initial resolution uses exact contract
+identity and explicit provider selection, reports ambiguity/missing requirements,
+and rejects unsupported dependency cycles. General shape subsumption, OWL-based
+program synthesis, and implicit dependency downloading are not prerequisites.
+
+The [worked dataset](./example0.gpt6a.trig) includes an illustrative FnO factory
+contract, input/output shape links, code mapping, and DepIn-inspired requirement
+records. They are queryable declarations, not proof that their example module
+exists or has executed.
 
 ## 9. Coherent proof and connections
 
@@ -379,8 +449,8 @@ First prove a compact path with real artifacts:
    an exact target snapshot.
 6. Query the batch membership, field structure, observation provenance, and
    annotation target; dump/reload and preserve those answers.
-7. Discover a compatible declared factory and bind actual inputs in a later
-   executor proof, after the dependency-vocabulary investigation.
+7. Discover a compatible declared factory and its requirements; a later executor
+   proof binds actual inputs/providers and verifies lifetime/release behavior.
 
 Exercise zero matches, two equal-valued occurrences, itemref ownership, concurrent
 parent/child revisions, redelivered entries, abort before seal, and ambiguous
@@ -402,3 +472,31 @@ each need their own actual execution evidence.
 The payoff is a discoverable chain: **which code can consume this structure →
 which procedure ran → which batch it produced → which exact occurrence an agent
 annotated → what claim or interpretation that annotation contributes.**
+
+## 10. Worked-example verification
+
+On 2026-10-20, the [verifier](./verify0.gpt6a.mjs) loaded the
+[205-quad example](./example0.gpt6a.trig) using the existing Oxigraph installation
+in `experiments/graphs` and jsdom installation in `schema`. It checked:
+
+- Batch membership through entry-side references and an explicit inverse path;
+  no accidental symmetric membership or assumed OWL inference.
+- An explicitly sealed empty batch, and observation/procedure provenance.
+- Nested property ownership through `itemref`, distinct from DOM ancestry.
+- Discovery of the factory's declared input shape and two required service slots.
+- Actual fixture CSS matches and quote/position selection of the same text.
+- Unicode code-point positions 4–16 mapping to UTF-16 offsets 5–17 in the emoji
+  fixture; direct reuse of those position numbers gives the wrong substring.
+- Identical answers and all quads after both TriG and N-Quads dump/reload.
+
+Run from the repository root:
+
+```sh
+node design/observation-queries/verify0.gpt6a.mjs
+```
+
+The fixture has only IRI-named nodes, so quad comparison does not exercise
+blank-node canonicalization. It is expected graph state plus static DOM checks,
+not a general microdata extractor, SHACL validator, live stream implementation,
+factory executor, or browser-native annotation interface. Those capabilities
+remain the proposed implementation proofs.

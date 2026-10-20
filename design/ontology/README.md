@@ -7,13 +7,15 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Commission, ontology-forward design, graph round-trip verification, and corpus navigation
+    title: Commission, ontology-forward design, graph round-trip verification, and connections to observation-query and annotation tools
   - resource: /design/ontology/design0.gpt6a.md
     title: Proposed ontology, semantic authority, reactive views, host publication, and portable export
   - resource: /design/ontology/observations0.gpt6a.trig
     title: Fictional two-observation dataset with scoped resolution and supporting evidence
   - resource: /design/ontology/verify0.gpt6a.mjs
     title: Executable checks of documented queries and TriG/N-Quads round trips
+  - resource: /design/observation-queries/README.md
+    title: Extension into SOSA queries, structural microdata, identified batches, annotations, and factories
 ---
 
 # Ontology-forward pageread
@@ -66,6 +68,9 @@ Uses the existing installation under `experiments/graphs`. The design records
 
 ## Related inquiry
 
+- [Observation queries and annotations](../observation-queries/README.md) —
+  specializes procedures/results into live-query batches and annotation tools;
+  connects data shapes and executable factories with recovered DepIn-O work.
 - [Design reading map](../README.md) — the preceding waves and parallel inquiry.
 - [AM's resolver/RDF pass](../reactive-indexes/draft1.gpt6am.md) — scoped claims and
   document-preserving graph projection; this proposal explores a further
