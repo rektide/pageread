@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Connect ontology, sensor-first query/annotation/factory work, interface inquiry, and the script-first product direction
+    title: Connect ontology, sensor routines, blackboard production, interface inquiry and the script-first product direction
+  - resource: /design/observation-queries/blackboard0.gpt6a.md
+    title: Proactive factories, pending telemetry content, receiving stores and export operations
   - resource: /design/observation-queries/sensor-routines0.gpt6a.md
     title: Sensor routines, declarative selection, module processors, and entry-triggered factories
   - resource: /design/observation-queries/README.md
@@ -37,6 +39,10 @@ sources:
   current installation APIs and proposal-status distinctions.
 
 ## Ontology and portable knowledge
+
+- [Blackboard production](./observation-queries/blackboard0.gpt6a.md) — input
+  matching and proactive derived content around sensor routines; pending
+  OTLP/OTAP representations, explicit export actions and Oxigraph receivers.
 
 - [Sensor routines](./observation-queries/sensor-routines0.gpt6a.md) — a focused
   authoring direction: sensors as queries producing values, HTML/XML recipe

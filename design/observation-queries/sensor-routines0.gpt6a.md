@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Human direction to rally around sensors as queries, mint routines in HTML/XML/custom-element form, and clarify factories waiting for entries
+    title: Sensor-first routines and entry factories, extended by the human's blackboard/proactive-content production direction
+  - resource: /design/observation-queries/blackboard0.gpt6a.md
+    title: Broader factory-system role: matching, declared outputs, proactive production, store receipts and export operations
   - resource: /design/observation-queries/design0.gpt6a.md
     title: SOSA query mapping, Web Annotation selectors, batch identities, annotation tools, and factory contracts
   - resource: /design/observation-queries/dependencies0.gpt6a.md
@@ -149,6 +151,12 @@ several `oa:refinedBy` values describe alternative ways to obtain the same
 selection; they are not a list of child factories.
 
 ## 4. What is a factory here?
+
+The subsequent [blackboard refinement](./blackboard0.gpt6a.md) expands the
+surrounding system: it sees values, advertises producible content and activates
+producers proactively. The construction/processing distinction below describes
+its smaller callable roles; it does not limit the whole factory system to
+constructing objects.
 
 There are two related operations worth naming clearly:
 

@@ -7,7 +7,9 @@ status: draft
 generated: { by: "model:openai/gpt-6-astra#xhigh", at: "2026-10-20" }
 sources:
   - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
-    title: Query-as-SOSA and sensor-first authoring, annotation tools, structural batches, factory contracts, and verified example integration
+    title: Sensor/query authoring and examples, then blackboard production, pending telemetry content, export actions and receiving stores
+  - resource: /design/observation-queries/blackboard0.gpt6a.md
+    title: Proactive content-producing factories, blackboard coordination and Oxigraph ingestion/export roles
   - resource: /design/observation-queries/sensor-routines0.gpt6a.md
     title: Sensor-first routines in HTML/XML, module leaves, and entry-triggered child bindings
   - resource: "opencode://ses_ea4bc04caffe3ibHrNRHIVRsJM"
@@ -31,6 +33,10 @@ an agent tools to annotate both the content and the machinery.**
   a query that produces values. Mint declarative routines, bind executable module
   leaves, and use entry templates to create/update independently owned children.
   Includes proposed HTML/custom-element authoring syntax and factory semantics.
+- [Blackboard production](./blackboard0.gpt6a.md): the factory system sees
+  values, declares outputs and proactively produces content; Oxigraph receives
+  and commits sensor results, while export commands act on pinned ready batches.
+  Separates construction, production, encoding and destination-specific delivery.
 - [Design](./design0.gpt6a.md): a query definition as `sosa:Procedure`, its
   evaluator as `sosa:Sensor`, each evaluation as `sosa:Observation`, and result
   batches as identified `sosa:Result`/`prov:Collection` resources.
