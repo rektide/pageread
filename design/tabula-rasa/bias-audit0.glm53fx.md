@@ -1,7 +1,7 @@
 ---
 type: Audit
 title: "Contamination audit for the pageread tabula-rasa design"
-description: "Exclusion map, bias categories, and provenance limits for independent pageread design; paths and decision kinds only, no existing solutions."
+description: "Exclusion map, bias categories, and provenance limits for the independent pageread design exercise; paths and decision kinds only, no existing solutions."
 resource: "/design/tabula-rasa/bias-audit0.glm53fx.md"
 status: draft
 generated:
@@ -9,7 +9,7 @@ generated:
   by: "model:zai-coding-plan/glm-5.3-flash#max"
 sources:
   - resource: "opencode://ses_ea510cab7ffexH6L4EDk85goSE"
-    title: "Contamination scout session producing this exclusion map"
+    title: "Contamination scout audit; revised for provenance and scope corrections"
   - resource: "/README.md"
     title: "Read to classify mission-level seed vs. contamination"
   - resource: "/package.json"
@@ -27,10 +27,10 @@ sources:
 # Bias audit — pageread tabula-rasa design
 
 Read-only contamination audit of `/home/rektide/src/pageread`, performed
-2026-10-20 before an independent, tabula-rasa design effort. Tells later agents
-what NOT to read, which decision kinds are prematurely fixed, and what
-provenance is known — paths and decision kinds only, no existing interfaces,
-data shapes, or solutions. Evidence: see [Audit sources](#audit-sources).
+2026-10-20 before an independent, tabula-rasa design effort. Tells research
+agents what NOT to read, which decision kinds are candidate contamination, and
+what provenance is known — paths and decision kinds only, no existing
+interfaces, data shapes, or solutions. Evidence: see [Audit sources](#audit-sources).
 
 ## Provenance discipline
 
@@ -38,16 +38,17 @@ data shapes, or solutions. Evidence: see [Audit sources](#audit-sources).
   commits share one VCS identity, used by humans and agents alike here;
   identity proves nothing. Never infer authorship or acceptance from history.
 - The only supported attribution basis is the **visible conversation**: the
-  items in the next section were committed by an earlier assistant during this
-  effort's chat, so they are attributable as assistant assumptions — not human
+  items in the next section were asserted as plans in earlier assistant
+  messages, so they are attributable as assistant assumptions — not human
   requirements. Everything else on disk remains **provenance unknown**.
 
-## Excluded paths
+## Excluded paths (independent research/design exercise only)
 
-Later agents (parent, research waves, implementers) must not read these. "Leak
-risk" is what reading would transmit.
+Excluded during the exercise for research/design agents (parent, waves) — not
+a standing implementer ban; future implementation, under its own commission,
+must inspect the actual repository. "Leak risk" is what reading would transmit.
 
-| Path | Decision kinds prematurely fixed there | Leak risk |
+| Path | Candidate contamination / exposure | Leak risk |
 | --- | --- | --- |
 | `schema/` | microdata vocabulary and record model; identifier scheme; trace/event adaptation shape | high |
 | `signals/` | reactivity primitive selection; routing and subscription semantics | high |
@@ -60,6 +61,10 @@ risk" is what reading would transmit.
 | `.jj/`, git history | commit messages may carry design wording | medium |
 | `tsconfig.base.json`, `.oxlintrc.json`, `.gitignore` | operational config only | low — safe |
 
+Table entries are candidate exposures inferred from path inventory and
+manifests; source-level choices were NOT verified (no source contents read).
+Only the conversation-derived assumptions below are attributed, as such.
+
 Operational commands safe to run without reading excluded files: `pnpm install`;
 the `pnpm build` / `pnpm check` / `pnpm test` aggregators;
 `pnpm -r check:types`; `pnpm -r test`; `oxlint`; `oxfmt`. Run them as commands;
@@ -69,8 +74,8 @@ do not read the manifest fields behind them.
 
 ### Attributed assistant assumptions — reopen in the independent design
 
-Known only from the visible conversation; two were not located on disk at audit
-time (the audit opened no source contents):
+Asserted in earlier assistant messages (visible conversation only); two were
+not located on disk at audit time (the audit opened no source contents):
 
 - a custom TC39-style signals core/package (vs. any other primitive/library);
 - mandatory Rust scaffolding (user scope: Rust optional, tracing-test if used);
@@ -94,19 +99,17 @@ new design is not anchored to concrete interfaces:
 
 ### Provenance unknown — treat as contamination, do not attribute
 
-Everything not covered above: schema vocabulary, record, identifier, and
-trace/event shapes; store interface details beyond the user-named shape;
-dependency selections; toolchain choices beyond global Rekon defaults; README
-ideas beyond the mission line.
+Everything else: schema vocabulary, record, identifier, and trace/event
+shapes; store interface details beyond the user-named shape; dependency
+selections; README ideas beyond the mission line.
 
 ## What this audit did not find
 
-No pre-existing design or doc corpus exists in this repo: no `design/` or
-`doc/` directory, no repo `AGENTS.md`, `CLAUDE.md`, `CONTEXT.md`, or
-`llms.txt`, and no `~/wiki` or `~/archive` copies. Nothing was rewritten;
-`design/tabula-rasa/` is new.
+No pre-existing design/doc corpus exists here: no `design/` or `doc/`
+directory, no repo `AGENTS.md`/`CLAUDE.md`/`CONTEXT.md`/`llms.txt`, no
+`~/wiki` or `~/archive` copies; nothing rewritten; `design/tabula-rasa/` is new.
 
-## Exclusion protocol (reusable for later agents)
+## Exclusion protocol (for the design exercise)
 
 1. Scope: all pre-existing pageread material is out of bounds — every
    pre-existing source tree (`schema/`, `signals/`, `store/`, root
@@ -115,14 +118,13 @@ No pre-existing design or doc corpus exists in this repo: no `design/` or
 2. Do not read excluded material, and do not derive requirements, names,
    shapes, or scope from it — even negatively ("the old code did X, so we
    avoid X" is still contamination).
-3. Allowed inputs: the approved brief [brief0.gpt6a.md](brief0.gpt6a.md), user
-   statements made in the live session, and primary sources fetched fresh
-   (spec/vendor documentation for OTel semantic conventions, browser APIs,
-   WXT/Vite, Playwright, MSW, and similar). Prefer primary sources over any
-   summary, including this one.
-4. Research waves and other subagents receive the excluded-path table and this
-   protocol verbatim in their prompts; there is no repo-local `AGENTS.md`
-   guardrail to rely on.
+3. Allowed inputs: the approved brief [brief0.gpt6a.md](brief0.gpt6a.md),
+   live-session user statements, and primary sources fetched fresh (spec/vendor
+   docs for OTel semantic conventions, browser APIs, WXT/Vite, Playwright,
+   MSW). Prefer primary sources over any summary, including this one.
+4. Ensure research waves and other subagents work under an equal or stricter
+   whole-repo exclusion; retransmit the table and this protocol only where no
+   such ban is already in force. There is no repo-local `AGENTS.md` guardrail.
 5. Scratch work goes in `.test-agent/<topic>/` (gitignored); durable outputs
    only under `design/tabula-rasa/`.
 6. Acceptance requires an explicit user statement. Never infer it from VCS
@@ -132,7 +134,7 @@ No pre-existing design or doc corpus exists in this repo: no `design/` or
 
 ## Companion documents
 
-Created by the parent after this audit; intentionally dangling at commit time:
+Companion destinations supplied by parent; contents not read:
 
 - [brief0.gpt6a.md](brief0.gpt6a.md) — the new user-grounded ask;
 - [design0.gpt6a.md](design0.gpt6a.md) — independent candidate design;
@@ -140,8 +142,7 @@ Created by the parent after this audit; intentionally dangling at commit time:
 
 ## Audit sources
 
-What this audit itself opened, with narrow purpose; source-tree contents were
-not read (names and sizes only):
+What this audit itself opened (source-tree contents not read; names/sizes only):
 
 - `README.md` — classify mission-level seed vs. contamination.
 - `package.json`; `pnpm-workspace.yaml`; `.gitignore` — scripts-vs-wording
@@ -154,6 +155,6 @@ not read (names and sizes only):
 
 ## Verification
 
-Line count within the 100–160 budget; relative links enumerated and matched
-against the companion list; no code, test, or build tasks run. Single
-explicit-path jj commit.
+Line count within budget; links enumerated; no code/test/build tasks run;
+explicit-path jj commits. 2026-10-20 revision: attribution wording,
+inferred-not-verified labels, exercise-only scope, companion status.
