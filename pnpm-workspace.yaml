@@ -1,0 +1,9 @@
+packages:
+  - schema
+  - signals
+  - store
+  - extension-kit
+  - extension-build
+  - indexer
+  - extensions/*
+  - harness/*

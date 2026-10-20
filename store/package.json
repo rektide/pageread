@@ -1,0 +1,24 @@
+{
+	"name": "@pageread/store",
+	"version": "0.0.1",
+	"description": "Cache-shaped, MIME-typed content store (IndexedDB core, CacheStorage adapter) with event outputs and a Content-Indexing-API-style directory facade",
+	"license": "MIT",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"build": "tsdown",
+		"check:types": "tsgo --noEmit",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@pageread/schema": "workspace:*",
+		"@pageread/signals": "workspace:*"
+	},
+	"devDependencies": {
+		"fake-indexeddb": "^6.2.2",
+		"tsdown": "^0.15.0",
+		"vitest": "^4.0.0"
+	}
+}
