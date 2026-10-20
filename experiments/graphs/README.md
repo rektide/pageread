@@ -152,6 +152,6 @@ The test is a page reload/reconstruction test, not a browser crash, disk-fsync o
 
 ## Connections and next useful experiment
 
-This realizes the scoped-evidence and graph-projection argument in [round two](../../design/reactive-indexes/draft1.gpt6am.md). The older [round-one design](../../design/reactive-indexes/draft0.gpt6am.md) motivates the recoverable-change boundary, which this checkpoint experiment deliberately does not implement.
+This realizes the scoped-evidence and graph-projection argument in [round two](/design/reactive-indexes/draft1.gpt6am.md). The older [round-one design](/design/reactive-indexes/draft0.gpt6am.md) motivates the recoverable-change boundary, which this checkpoint experiment deliberately does not implement. The [experiment map](../README.md) connects this portable export to reader generation and ATProto publication.
 
 The best next comparison is a native host importing the exported N-Quads plus exact documents, running the same queries, then proving transactional restart with a recorded commit position. A second useful fixture would introduce a later complete replacement and an explicit deletion assertion: that forces a real coverage/authority policy instead of treating maximum revision as sufficient forever.

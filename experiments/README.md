@@ -29,10 +29,10 @@ Each experiment has its own package/dependency boundary so a finding can be
 kept, compared or replaced without silently becoming production architecture.
 Their README files own commands and verified limitations.
 
-| Experiment | Question | State at commissioning |
+| Experiment | Question | Verified state |
 | --- | --- | --- |
 | [Reader loop](reader-loop/README.md) | Can a page request produce a retained executable reader with inspectable inflight state? | Runnable MSW/jsdom proof; Chrome adapter unit-tested |
-| `graphs/` | How do browser Oxigraph, persistence and observation graphs compose? | AM building visible/queryable iterations |
+| [Graphs](graphs/README.md) | How do browser Oxigraph, persistence and observation graphs compose? | WASM playground + IDB checkpoint/restart; 5 unit tests, Chromium proof, typecheck/build and 58-quad export |
 | `publishing/` | How can scripts and RDF datasets be published as lexicon-governed records? | AM building validated records and mock-PDS round trips |
 
 The extension build proof lives outside this experiment subtree, under
@@ -40,6 +40,9 @@ The extension build proof lives outside this experiment subtree, under
 owns the root build machinery. At dispatch, the previous core had passing unit
 tests but failing typechecks, and no built WXT extension. A test count alone is
 not evidence that an extension can load.
+
+The graph playground is served at **http://localhost:4317/** during this session.
+To restart it, run `pnpm dev --port 4317` from `experiments/graphs`.
 
 ## Integration target
 
