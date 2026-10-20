@@ -8,6 +8,8 @@ generated:
   at: "2026-10-20"
   by: "model:openai/gpt-6-astra"
 sources:
+  - resource: "opencode://ses_ea538b494ffej4MXIdPDIIDTLU"
+    title: Connected the actual retained reader-loop artifact to publication and verified byte/runtime/match-evidence readback
   - resource: "opencode://ses_ea4d321acffe570t5fjBe7tkO8"
     title: Built and verified isolated publication tools, corrected SDK textual blob decoding and Oxigraph lexical normalization, researched schema authority and MV3 execution boundaries
   - resource: "https://atproto.com/specs/lexicon"
@@ -135,6 +137,18 @@ const reader = await prepareReader(
 
 This mapping retains generation/match evidence as bounded text, not dedicated
 queryable lexicon fields. It does not translate ESM into user-script syntax.
+
+The mapping is also runnable against the actual retained artifact:
+
+```sh
+# First run pnpm demo in ../reader-loop; use its printed artifact path.
+pnpm integration:reader ../reader-loop/.data/artifacts/reader-<operation-id>.json
+```
+
+This read-only file integration publishes through the mock PDS and asserts exact
+code bytes, the `chrome-user-script` runtime and retained match evidence on
+readback. The parent verified it with the generated 170-byte fixture reader.
+It does not execute the downloaded script or require imports from reader-loop.
 
 `authenticatedAgent` is an official `@atproto/api` `Agent`; an OAuth session or
 authenticated fetch handler can own signing, renewal and transport. This

@@ -33,13 +33,15 @@ Their README files own commands and verified limitations.
 | --- | --- | --- |
 | [Reader loop](reader-loop/README.md) | Can a page request produce a retained executable reader with inspectable inflight state? | Runnable MSW/jsdom proof; Chrome adapter unit-tested |
 | [Graphs](graphs/README.md) | How do browser Oxigraph, persistence and observation graphs compose? | WASM playground + IDB checkpoint/restart; 5 unit tests, Chromium proof, typecheck/build and 58-quad export |
-| `publishing/` | How can scripts and RDF datasets be published as lexicon-governed records? | AM building validated records and mock-PDS round trips |
+| [Publishing](publishing/README.md) | How can scripts and RDF datasets be published as lexicon-governed records? | 11 tests; actual graph export and retained reader artifact round-trip through mock PDS |
 
-The extension build proof lives outside this experiment subtree, under
-`extension-kit/`, `extension-build/`, `extensions/` and `harness/`. Its AM session
-owns the root build machinery. At dispatch, the previous core had passing unit
-tests but failing typechecks, and no built WXT extension. A test count alone is
-not evidence that an extension can load.
+The [extension build proof](../extension-build/README.md) lives outside this
+experiment subtree. It now builds loadable WXT artifacts: library and background/
+popup modules are preserved; content scripts remain IIFE bundles. The
+[browser harness](../harness/README.md) proves actual capture, IDB persistence,
+named index/search and same-profile restart readback. Core build/checks and
+50 tests pass. At dispatch, the previous core had passing unit tests but failing
+typechecks and no built extension; that predecessor is preserved in history.
 
 The graph playground is served at **http://localhost:4317/** during this session.
 To restart it, run `pnpm dev --port 4317` from `experiments/graphs`.
@@ -58,7 +60,9 @@ ask to read a page
   -> publish selected reader/dataset artifacts via ATProto
 ```
 
-The experiments exercise individual seams, not this whole sequence yet.
+The experiments exercise individual seams, not this whole sequence yet. Both
+the actual RDF export and the actual retained reader artifact have crossed the
+publication seam with exact byte comparison after mock-PDS readback.
 The browser adapter can use Chrome's `userScripts` API for user-supplied
 JavaScript; packaged reader modules remain a distinct execution path.
 `AgentTransport` initially uses a small fixture HTTP protocol, not a claim of

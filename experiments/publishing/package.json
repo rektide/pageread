@@ -9,7 +9,8 @@
     "test": "node --test src/publish.test.ts",
     "dry-run": "node src/cli.ts dry-run",
     "smoke": "node src/cli.ts smoke",
-    "integration": "node src/integration.ts"
+    "integration": "node src/integration.ts",
+    "integration:reader": "node src/reader-integration.ts"
   },
   "dependencies": {
     "@atproto/api": "^0.28.1",
