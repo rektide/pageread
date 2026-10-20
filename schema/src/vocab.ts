@@ -29,6 +29,9 @@ export const MEDIA_TYPES = {
 	span: "application/vnd.pageread.span+json",
 	event: "application/vnd.pageread.event+json",
 	item: "application/vnd.pageread.item+json",
+	/** thin conversation metadata (titles, branches, edits) joined with
+	 * traces by the resolver — the hybrid model */
+	conversation: "application/vnd.pageread.conversation+json",
 	index: "application/vnd.pageread.index+json",
 	directory: "application/vnd.pageread.directory+json",
 	capture: "application/vnd.pageread.capture+json",
@@ -37,6 +40,7 @@ export const MEDIA_TYPES = {
 /** Well-known URN stems for content-store keys. */
 export const URN_STEMS = {
 	trace: "urn:pageread:trace:",
+	conversation: "urn:pageread:conversation:",
 	raw: "urn:pageread:raw:",
 	index: "urn:pageread:index:",
 	directory: "urn:pageread:content-index",

@@ -1,0 +1,28 @@
+{
+	"name": "@pageread/extension-kit",
+	"version": "0.0.1",
+	"description": "Extension-writing toolkit: main-world network hooks (fetch/XHR/SSE), nonce bridge, SW reader runtime, live DOM sources, and the ExtensionSpec DSL",
+	"license": "MIT",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./bridge": "./src/bridge/index.ts",
+		"./sw": "./src/sw/index.ts"
+	},
+	"scripts": {
+		"build": "tsdown",
+		"check:types": "tsgo --noEmit",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@pageread/schema": "workspace:*",
+		"@pageread/signals": "workspace:*",
+		"@pageread/store": "workspace:*"
+	},
+	"devDependencies": {
+		"jsdom": "^28.0.0",
+		"msw": "^3.0.0",
+		"tsdown": "^0.15.0",
+		"vitest": "^4.0.0"
+	}
+}
